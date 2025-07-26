@@ -6,13 +6,35 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E8F6A6512E257FB500E68A5A /* ArcGIS in Frameworks */ = {isa = PBXBuildFile; productRef = E8F6A6502E257FB500E68A5A /* ArcGIS */; };
+		E8F6A6542E25806900E68A5A /* ArcGISToolkit in Frameworks */ = {isa = PBXBuildFile; productRef = E8F6A6532E25806900E68A5A /* ArcGISToolkit */; };
+		E8F6A65D2E25B92C00E68A5A /* MapboxMaps in Frameworks */ = {isa = PBXBuildFile; productRef = E8F6A65C2E25B92C00E68A5A /* MapboxMaps */; };
+		E8F6A6E92E2F48CA00E68A5A /* Modals in Frameworks */ = {isa = PBXBuildFile; productRef = E8F6A6E82E2F48CA00E68A5A /* Modals */; };
+		E8F6A7182E35524500E68A5A /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = E8F6A7172E35523F00E68A5A /* .gitignore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		E82A5BBA2E22E60A00CD5C87 /* CampusNav.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CampusNav.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8F6A7172E35523F00E68A5A /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E8F6A6592E25B78300E68A5A /* Exceptions for "CampusNav" folder in "CampusNav" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E82A5BB92E22E60A00CD5C87 /* CampusNav */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		E82A5BBC2E22E60A00CD5C87 /* CampusNav */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E8F6A6592E25B78300E68A5A /* Exceptions for "CampusNav" folder in "CampusNav" target */,
+			);
 			path = CampusNav;
 			sourceTree = "<group>";
 		};
@@ -23,6 +45,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E8F6A65D2E25B92C00E68A5A /* MapboxMaps in Frameworks */,
+				E8F6A6542E25806900E68A5A /* ArcGISToolkit in Frameworks */,
+				E8F6A6E92E2F48CA00E68A5A /* Modals in Frameworks */,
+				E8F6A6512E257FB500E68A5A /* ArcGIS in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -32,6 +58,7 @@
 		E82A5BB12E22E60A00CD5C87 = {
 			isa = PBXGroup;
 			children = (
+				E8F6A7172E35523F00E68A5A /* .gitignore */,
 				E82A5BBC2E22E60A00CD5C87 /* CampusNav */,
 				E82A5BBB2E22E60A00CD5C87 /* Products */,
 			);
@@ -65,6 +92,10 @@
 			);
 			name = CampusNav;
 			packageProductDependencies = (
+				E8F6A6502E257FB500E68A5A /* ArcGIS */,
+				E8F6A6532E25806900E68A5A /* ArcGISToolkit */,
+				E8F6A65C2E25B92C00E68A5A /* MapboxMaps */,
+				E8F6A6E82E2F48CA00E68A5A /* Modals */,
 			);
 			productName = CampusNav;
 			productReference = E82A5BBA2E22E60A00CD5C87 /* CampusNav.app */;
@@ -94,6 +125,12 @@
 			);
 			mainGroup = E82A5BB12E22E60A00CD5C87;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				E8F6A64F2E257FB500E68A5A /* XCRemoteSwiftPackageReference "arcgis-maps-sdk-swift" */,
+				E8F6A6522E25806900E68A5A /* XCRemoteSwiftPackageReference "arcgis-maps-sdk-swift-toolkit" */,
+				E8F6A65B2E25B92C00E68A5A /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */,
+				E8F6A6E72E2F48CA00E68A5A /* XCRemoteSwiftPackageReference "Modals" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E82A5BBB2E22E60A00CD5C87 /* Products */;
 			projectDirPath = "";
@@ -109,6 +146,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E8F6A7182E35524500E68A5A /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -252,8 +290,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"CampusNav/Preview Content\"";
+				DEVELOPMENT_TEAM = G546PX9MB2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CampusNav/Info.plist;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Allow your location to determine navigation";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -280,8 +321,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"CampusNav/Preview Content\"";
+				DEVELOPMENT_TEAM = G546PX9MB2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CampusNav/Info.plist;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Allow your location to determine navigation";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -322,6 +366,64 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E8F6A64F2E257FB500E68A5A /* XCRemoteSwiftPackageReference "arcgis-maps-sdk-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Esri/arcgis-maps-sdk-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 200.7.0;
+			};
+		};
+		E8F6A6522E25806900E68A5A /* XCRemoteSwiftPackageReference "arcgis-maps-sdk-swift-toolkit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Esri/arcgis-maps-sdk-swift-toolkit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 200.7.1;
+			};
+		};
+		E8F6A65B2E25B92C00E68A5A /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mapbox/mapbox-maps-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.0.0;
+			};
+		};
+		E8F6A6E72E2F48CA00E68A5A /* XCRemoteSwiftPackageReference "Modals" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/fieldday-ai/Modals";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E8F6A6502E257FB500E68A5A /* ArcGIS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E8F6A64F2E257FB500E68A5A /* XCRemoteSwiftPackageReference "arcgis-maps-sdk-swift" */;
+			productName = ArcGIS;
+		};
+		E8F6A6532E25806900E68A5A /* ArcGISToolkit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E8F6A6522E25806900E68A5A /* XCRemoteSwiftPackageReference "arcgis-maps-sdk-swift-toolkit" */;
+			productName = ArcGISToolkit;
+		};
+		E8F6A65C2E25B92C00E68A5A /* MapboxMaps */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E8F6A65B2E25B92C00E68A5A /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */;
+			productName = MapboxMaps;
+		};
+		E8F6A6E82E2F48CA00E68A5A /* Modals */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E8F6A6E72E2F48CA00E68A5A /* XCRemoteSwiftPackageReference "Modals" */;
+			productName = Modals;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E82A5BB22E22E60A00CD5C87 /* Project object */;
 }
