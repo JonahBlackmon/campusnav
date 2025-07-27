@@ -6,19 +6,6 @@
 //
 import SwiftUI
 
-struct tempView: View {
-    @State var showDirections: Bool = false
-    var body: some View {
-        ZStack {
-            Button {
-                showDirections.toggle()
-            } label: {
-                Text("Hello World")
-            }
-        }
-    }
-}
-
 struct DirectionView: View {
     @Binding var directions: [DirectionStep]
     @Binding var showDirections: Bool
@@ -56,8 +43,4 @@ struct DirectionItem: View {
     var body: some View {
         Text("Hello World!")
     }
-}
-
-#Preview {
-    tempView()
 }

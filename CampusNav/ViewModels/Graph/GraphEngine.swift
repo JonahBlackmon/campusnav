@@ -8,78 +8,16 @@
 import MapKit
 import SwiftUI
 
-struct Coordinate {
-    var latitude: Double
-    var longitude: Double
-    var clLocationCoordinate: CLLocationCoordinate2D {
-        CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-    }
-}
-
-struct Node {
-    var id: Int
-    var abbr: String?
-    var point: Coordinate
-}
-
-struct Pathway {
-    var from: Int
-    var to: Int
-    var distance: Double
-}
-
-final class NodeAnnotation: NSObject, MKAnnotation {
-    let coordinate: CLLocationCoordinate2D
-    let title: String?
-
-    init(node: Node) {
-        self.coordinate = node.point.clLocationCoordinate
-        self.title = node.abbr
-    }
-}
-
-
-struct Graph {
-    var nodes: [Node]
-    var pathways: [Pathway]
-    var num_nodes: Int
-    var num_paths: Int
-    
-    init(nodes: [Node], pathways: [Pathway], num_nodes: Int, num_paths: Int) {
-        self.num_nodes = num_nodes
-        self.num_paths = num_paths
-        self.nodes = nodes
-        self.pathways = pathways
-    }
-}
-
-//var graph = Graph(nodes: nodes, pathways: pathways, num_nodes: nodes.count, num_paths: pathways.count)
 var distance: Double = -1.0
-
-
-func haversine(a: Coordinate, b: Coordinate) -> Double {
-    let radius = 6371.0088
-    let dLat = deg2rad(degree: b.latitude - a.latitude)
-    let dLon = deg2rad(degree: b.longitude - a.longitude)
-    let lat1 = deg2rad(degree: a.latitude)
-    let lat2 = deg2rad(degree: b.latitude)
-    let x = sin(dLat / 2) * sin(dLat / 2) + cos(lat1) * cos(lat2) * sin(dLon / 2) * sin(dLon / 2)
-    let y = 2 * atan2(sqrt(x), sqrt(1 - x))
-    return radius * y * 1000
-}
-
-func deg2rad(degree: Double) -> Double {
-    return degree * (Double.pi / 180)
-}
 
 func find_closest_goal(graph: Graph, abbr: String?, pos: Coordinate) -> Int {
     var closest_node = -1
-    var distance = Double.infinity
+    var shortestDistance = Double.infinity
     for i in 0..<graph.num_nodes {
         if let nodeAbbr = graph.nodes[i].abbr, nodeAbbr == abbr {
-            let temp_distance = haversine(a: pos, b: graph.nodes[i].point)
-            if temp_distance < distance {
-                distance = temp_distance
+            let temp_distance = pos.distance(to: graph.nodes[i].point)
+            if temp_distance < shortestDistance {
+                shortestDistance = temp_distance
                 closest_node = i
             }
         }
@@ -89,7 +27,7 @@ func find_closest_goal(graph: Graph, abbr: String?, pos: Coordinate) -> Int {
 
 func find_closest_coordinate(pos: Coordinate, graph: inout Graph) -> Node {
     var closest = graph.nodes[0].point
-    var distance = haversine(a: pos, b: closest)
+    var distance = pos.distance(to: closest)
     
     var nearest_path_id: Int = -1
     var new_point = false
@@ -98,7 +36,7 @@ func find_closest_coordinate(pos: Coordinate, graph: inout Graph) -> Node {
         var temp_new = false
         var temp_id = -1
         let closest_on_path = find_closest_point_on_path(pos: pos, path: graph.pathways[i], graph: graph, new_point: &temp_new, node_id: &temp_id)
-        let path_dis = haversine(a: pos, b: closest_on_path)
+        let path_dis = pos.distance(to: closest_on_path)
         if path_dis < distance {
             distance = path_dis;
             closest = closest_on_path;
@@ -111,7 +49,7 @@ func find_closest_coordinate(pos: Coordinate, graph: inout Graph) -> Node {
     for i in 0..<graph.num_nodes {
         let node = graph.nodes[i]
         if node.abbr == nil {
-            let node_dis = haversine(a: pos, b: node.point)
+            let node_dis = pos.distance(to: node.point)
             if node_dis < distance {
                 distance = node_dis;
                 closest = node.point;
@@ -144,7 +82,7 @@ func find_closest_coordinate(pos: Coordinate, graph: inout Graph) -> Node {
     let current_path = Pathway(
         from: current_pos.id,
         to: new_point ? new_node.id : node_id,
-        distance: haversine(a: current_pos.point, b: new_point ? new_node.point : graph.nodes[node_id].point)
+        distance: current_pos.point.distance(to: new_point ? new_node.point : graph.nodes[node_id].point)
     )
     graph.num_paths += 1
     graph.pathways.append(current_path)
@@ -159,8 +97,8 @@ func split_path(path_index: Int, new_node: Node, graph: inout Graph) {
         distance: -1.0
     )
     oldPath.to = new_node.id
-    oldPath.distance = haversine(a: graph.nodes[oldPath.from].point, b: graph.nodes[oldPath.to].point)
-    newPath.distance = haversine(a: graph.nodes[newPath.from].point, b: graph.nodes[newPath.to].point)
+    oldPath.distance = graph.nodes[oldPath.from].point.distance(to: graph.nodes[oldPath.to].point)
+    newPath.distance = graph.nodes[newPath.from].point.distance(to: graph.nodes[newPath.to].point)
     graph.num_paths += 1
     graph.pathways[path_index] = oldPath
     graph.pathways.append(newPath)
@@ -195,7 +133,7 @@ func distance_to_path(pos: Coordinate, start: Coordinate, end: Coordinate) -> Do
         longitude: pathStartX + point * pathX
     )
     
-    return haversine(a: pos, b: closest)
+    return pos.distance(to: closest)
 }
 
 func find_closest_point_on_path(pos: Coordinate, path: Pathway, graph: Graph, new_point: inout Bool, node_id: inout Int) -> Coordinate {
@@ -240,7 +178,7 @@ func find_closest_point_on_path(pos: Coordinate, path: Pathway, graph: Graph, ne
 }
 
 private func coordinatesEqual(a: Coordinate, b: Coordinate) -> Bool {
-    return haversine(a: a, b: b) < 5
+    return a.distance(to: b) < 5
 }
 
 func a_star(graph: inout Graph, start: Int, goal: Int, out_path_len: inout Int) -> [Int] {
@@ -251,7 +189,7 @@ func a_star(graph: inout Graph, start: Int, goal: Int, out_path_len: inout Int) 
     var came_from: [Int] = Array(repeating: -1, count: n)
     
     g_score[start] = 0
-    f_score[start] = haversine(a: graph.nodes[start].point, b: graph.nodes[goal].point)
+    f_score[start] = graph.nodes[start].point.distance(to: graph.nodes[goal].point)
     
     while (true) {
         var current = -1
@@ -285,7 +223,7 @@ func a_star(graph: inout Graph, start: Int, goal: Int, out_path_len: inout Int) 
             if tentative_g < g_score[neighbor] {
                 came_from[neighbor] = current
                 g_score[neighbor] = tentative_g
-                f_score[neighbor] = tentative_g + haversine(a: graph.nodes[neighbor].point, b: graph.nodes[goal].point)
+                f_score[neighbor] = tentative_g + graph.nodes[neighbor].point.distance(to: graph.nodes[goal].point)
             }
         }
     }
@@ -337,7 +275,7 @@ func find_route(lat: Double, lng: Double, dest_abbr: String) -> ([CLLocationCoor
     var newSteps: Int = -1
     let node_path = a_star(graph: &graph, start: pos_node.id, goal: goal_id, out_path_len: &newSteps)
     for i in 0..<node_path.count - 1{
-        distance += haversine(a: graph.nodes[node_path[i]].point, b: graph.nodes[node_path[i + 1]].point)
+        distance += graph.nodes[node_path[i]].point.distance(to: graph.nodes[node_path[i + 1]].point)
     }
     print("Distance: \(distance)")
     return (node_path.map { graph.nodes[$0].point.clLocationCoordinate }, node_path.map { graph.nodes[$0] }, distance)

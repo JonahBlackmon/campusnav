@@ -9,20 +9,27 @@ import SwiftUI
 import MapboxMaps
 import Turf
 
-struct Building: Identifiable, Codable {
-    var id = UUID()
-    let abbr: String
-    let name: String
-    let photoURL: String
-}
-
-class BuildingManager: ObservableObject {
+class BuildingViewModel: ObservableObject {
     
     @Published var buildingList: [Building] = []
     
     @Published var popularBuildings: [Building] = []
     
+    @Published var selectedBuilding: Building? = nil
+    
     private var popularAbbrs: [String] = ["PCL", "JES", "KIN", "WEL", "D21", "UNB", "FAC", "GRE", "WAG"]
+    
+    func name() -> String {
+        return selectedBuilding?.name ?? selectedBuilding?.abbr ?? ""
+    }
+    
+    func abbr() -> String {
+        return selectedBuilding?.abbr ?? ""
+    }
+    
+    func url() -> String {
+        return selectedBuilding?.photoURL ?? ""
+    }
     
     func loadBuildings(pathName: String) {
         guard let url = Bundle.main.url(forResource: pathName, withExtension: "geojson") else {
@@ -66,18 +73,14 @@ class BuildingManager: ObservableObject {
         
     }
     
-    func searchBuilding(search: String) -> [Building] {
+    func searchBuilding(matching search: String) -> [Building] {
         guard !search.isEmpty else {
             return []
         }
         let uppercasedSearch = search.uppercased()
-        let returnBuildings: [Building] = buildingList.filter { building in
-            if building.abbr.contains(uppercasedSearch) || building.name.contains(uppercasedSearch) {
-                return true
-            }
-            return false
+        return buildingList.filter {
+            $0.abbr.contains(uppercasedSearch) || $0.name.uppercased().contains(uppercasedSearch)
         }
-        return returnBuildings
     }
     
 }

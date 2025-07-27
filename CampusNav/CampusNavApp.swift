@@ -13,16 +13,16 @@ import CoreLocation
 struct CampusNavApp: App {
     
     @StateObject var settingsManager: SettingsManager = SettingsManager()
-    @StateObject var buildingManager: BuildingManager = BuildingManager()
-    @StateObject var directionManager: DirectionManager = DirectionManager(currentCoordinates: [], currentNodes: [])
+    @StateObject var bulidingVM: BuildingViewModel = BuildingViewModel()
+    @StateObject var navigationVM: NavigationViewModel = NavigationViewModel(currentCoordinates: [], currentNodes: [])
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(buildingManager)
+                .environmentObject(bulidingVM)
                 .environmentObject(settingsManager)
-                .environmentObject(directionManager)
+                .environmentObject(navigationVM)
                 .onAppear {
-                    buildingManager.loadBuildings(pathName: "buildings_simple")
+                    bulidingVM.loadBuildings(pathName: "buildings_simple")
                 }
         }
     }
@@ -30,8 +30,8 @@ struct CampusNavApp: App {
 
 #Preview {
     ContentView()
-        .environmentObject(BuildingManager())
+        .environmentObject(BuildingViewModel())
         .environmentObject(SettingsManager())
-        .environmentObject(DirectionManager(currentCoordinates: [], currentNodes: []))
+        .environmentObject(NavigationViewModel(currentCoordinates: [], currentNodes: []))
 }
 

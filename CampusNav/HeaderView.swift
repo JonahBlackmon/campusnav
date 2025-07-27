@@ -3,45 +3,47 @@ import SwiftUI
 struct HeaderView: View {
     @State var searching: Bool = false
     @State var animateFavorites: Bool = false
-    @Binding var searchingView: Bool
-    @Binding var routing: Bool
+//    @Binding var searchingView: Bool
+//    @Binding var routing: Bool
     let animationDuration: Double = 1.0
     var collegePrimary: Color
     var collegeSecondary: Color
     @State var searchText: String = ""
     @FocusState private var isSearchFieldFocused: Bool
     @State var settingsView: Bool = false
-    @Binding var showNavigationCard: Bool
-    @Binding var selectedBuildingAbbr: String
-    @Binding var selectedDestinationName: String
-    @Binding var selectedPhotoURL: String
     @State var showMenu: Bool = false
     @State var animateSettings: Bool = false
-    @EnvironmentObject var buildingManager: BuildingManager
+    @EnvironmentObject var navState: NavigationUIState
+    @EnvironmentObject var buildingVM: BuildingViewModel
     @EnvironmentObject var settingsManager: SettingsManager
     var body: some View {
         ZStack {
             if searching {
-                SearchView(collegePrimary: collegePrimary, isSearchFieldFocused: _isSearchFieldFocused, showNavigationCard: $showNavigationCard, selectedBuildingAbbr: $selectedBuildingAbbr, selectedDestinationName: $selectedDestinationName, selectedPhotoURL: $selectedPhotoURL, exitHeader: ExitHeader, searchText: $searchText)
-                    .environmentObject(buildingManager)
+                SearchView(collegePrimary: collegePrimary, isSearchFieldFocused: _isSearchFieldFocused, exitHeader: ExitHeader, searchText: $searchText)
+                    .environmentObject(navState)
+                    .environmentObject(buildingVM)
             }
             if showMenu {
-                FavoritesView(menuView: $showMenu, showNavigationCard: $showNavigationCard, selectedBuildingAbbr: $selectedBuildingAbbr, selectedDestinationName: $selectedDestinationName, selectedPhotoURL: $selectedPhotoURL, animateFavorites: $animateFavorites, collegePrimary: collegePrimary)
+                FavoritesView(menuView: $showMenu, animateFavorites: $animateFavorites, collegePrimary: collegePrimary)
+                    .environmentObject(navState)
+                    .environmentObject(buildingVM)
                     .environmentObject(settingsManager)
             }
             if settingsView {
-                SettingsView(settingsView: $settingsView, showNavigationCard: $showNavigationCard, selectedBuildingAbbr: $selectedBuildingAbbr, selectedDestinationName: $selectedDestinationName, selectedPhotoURL: $selectedPhotoURL, animateSettings: $animateSettings, collegePrimary: collegePrimary)
+                SettingsView(settingsView: $settingsView, animateSettings: $animateSettings, collegePrimary: collegePrimary)
+                    .environmentObject(navState)
+                    .environmentObject(buildingVM)
                     .environmentObject(settingsManager)
             }
             ZStack {
                 SearchButton
-                    .offset(y: routing ? -200 : 0)
+                    .offset(y: navState.isNavigating ? -200 : 0)
                 HStack {
                     SettingsButton
-                        .offset(x: searching || routing ? -200 : 0)
+                        .offset(x: searching || navState.isNavigating ? -200 : 0)
                     Spacer()
                     favoritesButton
-                        .offset(x: searching || routing ? 200 : 0)
+                        .offset(x: searching || navState.isNavigating ? 200 : 0)
                 }
             }
             .frame(maxHeight: .infinity, alignment: .top)
@@ -54,7 +56,7 @@ struct HeaderView: View {
         Button {
             withAnimation(.easeInOut(duration: 0.3)) {
                 searching = false
-                searchingView = false
+                navState.isSearching = false
                 settingsView = false
                 animateSettings = false
                 isSearchFieldFocused = false
@@ -99,7 +101,7 @@ struct HeaderView: View {
         Button {
             withAnimation(.easeInOut(duration: 0.3)) {
                 searching = false
-                searchingView = false
+                navState.isSearching = false
                 animateFavorites = false
                 showMenu = false
                 isSearchFieldFocused = false
@@ -138,7 +140,7 @@ struct HeaderView: View {
     func ExitHeader() {
         withAnimation(.easeInOut(duration: 0.3)) {
             searching = false
-            searchingView = false
+            navState.isSearching = false
             settingsView = false
             animateSettings = false
             animateFavorites = false
@@ -167,7 +169,7 @@ struct HeaderView: View {
                 animateFavorites = false
                 showMenu = false
                 searching = true
-                searchingView = true
+                navState.isSearching = true
                 isSearchFieldFocused = true
             }
         } label: {
@@ -230,10 +232,6 @@ struct HeaderView: View {
     struct SettingsView: View {
         @EnvironmentObject var settingsManager: SettingsManager
         @Binding var settingsView: Bool
-        @Binding var showNavigationCard: Bool
-        @Binding var selectedBuildingAbbr: String
-        @Binding var selectedDestinationName: String
-        @Binding var selectedPhotoURL: String
         @Binding var animateSettings: Bool
         var collegePrimary: Color
         var body: some View {
@@ -264,11 +262,9 @@ struct HeaderView: View {
     
     struct FavoritesView: View {
         @EnvironmentObject var settingsManager: SettingsManager
+        @EnvironmentObject var buildingVM: BuildingViewModel
+        @EnvironmentObject var navState: NavigationUIState
         @Binding var menuView: Bool
-        @Binding var showNavigationCard: Bool
-        @Binding var selectedBuildingAbbr: String
-        @Binding var selectedDestinationName: String
-        @Binding var selectedPhotoURL: String
         @Binding var animateFavorites: Bool
         var collegePrimary: Color
         var body: some View {
@@ -287,8 +283,10 @@ struct HeaderView: View {
                     if !settingsManager.favorites.isEmpty {
                         ScrollView {
                             ForEach(Array(settingsManager.favorites.keys.enumerated()), id: \.element) { index, key in
-                                FavoritesItem(key: key, index: index, menuView: $menuView, showNavigationCard: $showNavigationCard, selectedBuildingAbbr: $selectedBuildingAbbr, selectedDestinationName: $selectedDestinationName, selectedPhotoURL: $selectedPhotoURL, animateFavorites: $animateFavorites)
+                                FavoritesItem(key: key, index: index, menuView: $menuView, animateFavorites: $animateFavorites)
                                     .environmentObject(settingsManager)
+                                    .environmentObject(buildingVM)
+                                    .environmentObject(navState)
                             }
                         }
                     } else {
@@ -313,12 +311,10 @@ struct HeaderView: View {
         let index: Int
         @State var show: Bool = false
         @Binding var menuView: Bool
-        @Binding var showNavigationCard: Bool
-        @Binding var selectedBuildingAbbr: String
-        @Binding var selectedDestinationName: String
-        @Binding var selectedPhotoURL: String
         @Binding var animateFavorites: Bool
+        @EnvironmentObject var navState: NavigationUIState
         @EnvironmentObject var settingsManager: SettingsManager
+        @EnvironmentObject var buildingVM: BuildingViewModel
         var name: String {
             return settingsManager.favorites[key]?.name ?? key
         }
@@ -329,10 +325,8 @@ struct HeaderView: View {
             Button {
                 menuView = false
                 animateFavorites = false
-                showNavigationCard = true
-                selectedBuildingAbbr = key
-                selectedDestinationName = name
-                selectedPhotoURL = url
+                navState.showNavigationCard = true
+                buildingVM.selectedBuilding = settingsManager.favorites[key]
             } label: {
                 HStack {
                     VStack(alignment: .leading) {
@@ -344,7 +338,7 @@ struct HeaderView: View {
                             .overlay(.offWhite)
                     }
                     Spacer()
-                    FavoritesButton(building_abbr: key, destination_name: name, selectedPhotoURL: url)
+                    FavoritesButton(building: settingsManager.favorites[key] ?? Building(abbr: key, name: "", photoURL: ""))
                         .environmentObject(settingsManager)
                         .font(.system(size: 18))
                 }
@@ -364,17 +358,14 @@ struct HeaderView: View {
     struct SearchView: View {
         let collegePrimary: Color
         @FocusState var isSearchFieldFocused: Bool
-        @Binding var showNavigationCard: Bool
-        @Binding var selectedBuildingAbbr: String
-        @Binding var selectedDestinationName: String
-        @Binding var selectedPhotoURL: String
         var exitHeader: () -> Void
-        @EnvironmentObject var buildingManager: BuildingManager
+        @EnvironmentObject var navState: NavigationUIState
+        @EnvironmentObject var buildingVM: BuildingViewModel
         @EnvironmentObject var settingsManager: SettingsManager
         @State var displayBuildings: [Building] = []
         @Binding var searchText: String
         var favorites: [Building] { Array(settingsManager.favorites.values) }
-        var nonFavoritePopular: [Building] { buildingManager.popularBuildings.filter { !settingsManager.favorites.keys.contains($0.abbr) } }
+        var nonFavoritePopular: [Building] { buildingVM.popularBuildings.filter { !settingsManager.favorites.keys.contains($0.abbr) } }
         var defaultList: [Building] { favorites + nonFavoritePopular }
         var body: some View {
             ZStack() {
@@ -388,7 +379,7 @@ struct HeaderView: View {
                     VStack(spacing: 10) {
                         ForEach(
                             Array(displayBuildings.enumerated()), id: \.element.id) { index, building in
-                            SearchItem(BuildingName: building.name, BuildingAbbr: building.abbr, BuildingURL: building.photoURL, collegePrimary: collegePrimary, index: index, showNavigationCard: $showNavigationCard, selectedBuildingAbbr: $selectedBuildingAbbr, selectedDestinationName: $selectedDestinationName, selectedPhotoURL: $selectedPhotoURL, exitHeader: exitHeader)
+                                SearchItem(selected: building, collegePrimary: collegePrimary, index: index, exitHeader: exitHeader)
                         }
                     }
                 }
@@ -400,7 +391,7 @@ struct HeaderView: View {
                 .onChange(of: searchText) {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         if !searchText.isEmpty {
-                            displayBuildings = buildingManager.searchBuilding(search: searchText)
+                            displayBuildings = buildingVM.searchBuilding(matching: searchText)
                         } else {
                             displayBuildings = defaultList
                         }
@@ -411,33 +402,27 @@ struct HeaderView: View {
     }
 
     struct SearchItem: View {
-        let BuildingName: String
-        let BuildingAbbr: String
-        let BuildingURL: String
+        let selected: Building
         let collegePrimary: Color
         @State var show: Bool = false
         var index: Int
-        @Binding var showNavigationCard: Bool
-        @Binding var selectedBuildingAbbr: String
-        @Binding var selectedDestinationName: String
-        @Binding var selectedPhotoURL: String
         var exitHeader: () -> Void
+        @EnvironmentObject var navState: NavigationUIState
+        @EnvironmentObject var buildingVM: BuildingViewModel
         var body: some View {
             HStack {
                 Button {
                     exitHeader()
-                    showNavigationCard = true
-                    selectedBuildingAbbr = BuildingAbbr
-                    selectedDestinationName = BuildingName
-                    selectedPhotoURL = BuildingURL
+                    navState.showNavigationCard = true
+                    buildingVM.selectedBuilding = selected
                 } label: {
                     Image(systemName: "location.circle.fill")
                     .font(.system(size: 22))
                     .padding(.trailing, 5)
                     VStack(alignment: .leading) {
-                        Text(BuildingName)
+                        Text(selected.name)
                             .font(.system(size: 20))
-                        Text(BuildingAbbr)
+                        Text(selected.abbr)
                             .font(.system(size: 10))
                             .foregroundStyle(collegePrimary)
                         Divider()
