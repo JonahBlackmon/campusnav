@@ -1,13 +1,14 @@
-# Xcode
-*.xcuserstate
-*.xcuserdatad
+# macOS
 .DS_Store
-bulid/
-DerivedData/
-*.ipa
-*.dSYM.zip
-*.dSYM
+
+# Xcode
+ios/*.xcuserstate
+ios/*.xcuserdatad
+ios/build/
+ios/DerivedData/
+ios/*.ipa
+ios/*.dSYM.zip
+ios/*.dSYM
 
 # Swift Package Manager
-.swiftpm/
-
+ios/.swiftpm/

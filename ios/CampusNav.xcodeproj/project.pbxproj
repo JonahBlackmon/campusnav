@@ -11,12 +11,10 @@
 		E8F6A6542E25806900E68A5A /* ArcGISToolkit in Frameworks */ = {isa = PBXBuildFile; productRef = E8F6A6532E25806900E68A5A /* ArcGISToolkit */; };
 		E8F6A65D2E25B92C00E68A5A /* MapboxMaps in Frameworks */ = {isa = PBXBuildFile; productRef = E8F6A65C2E25B92C00E68A5A /* MapboxMaps */; };
 		E8F6A6E92E2F48CA00E68A5A /* Modals in Frameworks */ = {isa = PBXBuildFile; productRef = E8F6A6E82E2F48CA00E68A5A /* Modals */; };
-		E8F6A7182E35524500E68A5A /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = E8F6A7172E35523F00E68A5A /* .gitignore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		E82A5BBA2E22E60A00CD5C87 /* CampusNav.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CampusNav.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E8F6A7172E35523F00E68A5A /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -58,7 +56,6 @@
 		E82A5BB12E22E60A00CD5C87 = {
 			isa = PBXGroup;
 			children = (
-				E8F6A7172E35523F00E68A5A /* .gitignore */,
 				E82A5BBC2E22E60A00CD5C87 /* CampusNav */,
 				E82A5BBB2E22E60A00CD5C87 /* Products */,
 			);
@@ -146,7 +143,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8F6A7182E35524500E68A5A /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
