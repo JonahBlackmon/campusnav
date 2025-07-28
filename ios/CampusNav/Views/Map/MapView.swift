@@ -57,7 +57,7 @@ struct MapBoxMapView: View {
     @State var selectedFeature: FeaturesetFeature?
     @State var currentZoom: Double = 13.9
     @State private var bobbingOffset: CGFloat = 0
-    
+    @State private var animatedUserCoordinate: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: 30.287265, longitude: -97.737051)
     @EnvironmentObject var navState: NavigationUIState
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var buildingVM: BuildingViewModel
@@ -97,9 +97,9 @@ struct MapBoxMapView: View {
                 }
                 
                 // Draw the user location
-                MapViewAnnotation(coordinate: navigationVM.currentLocation ?? CLLocationCoordinate2D(latitude: 30.287265, longitude: -97.737051)) {
-                    Circle()
-                        .foregroundStyle(.red)
+                MapViewAnnotation(coordinate: animatedUserCoordinate) {
+                    LocationPuck()
+                        .environmentObject(navigationVM)
                 }
                 
                 // Styling for visual labels and hidden boundaries for clickability
@@ -252,6 +252,9 @@ struct MapBoxMapView: View {
                 loadGeoJSON(url: "Inverted_UT_Campus_Boundary", layer: .inverted)
                 loadGeoJSON(url: "UT_Campus_Block", layer: .block)
                 loadGeoJSON(url: "buildings_simple", layer: .building)
+                if let current = navigationVM.currentLocation {
+                    animatedUserCoordinate = current
+                }
             }
             .onChange(of: navState.isNavigating) {
                 if navState.isNavigating {
@@ -263,8 +266,27 @@ struct MapBoxMapView: View {
                     }
                 }
             }
+            .onChange(of: navigationVM.currentLocation) {
+                interpolate()
+            }
         }
         .ignoresSafeArea()
+    }
+    
+    private func interpolate() {
+        let duration: TimeInterval = 1.0
+        let steps = 60
+        let interval = duration / Double(steps)
+
+        let deltaLat = ((navigationVM.currentLocation?.latitude ?? 30.287265) - animatedUserCoordinate.latitude) / Double(steps)
+        let deltaLon = ((navigationVM.currentLocation?.longitude ?? -97.737051) - animatedUserCoordinate.longitude) / Double(steps)
+
+        for step in 1...steps {
+            DispatchQueue.main.asyncAfter(deadline: .now() + interval * Double(step)) {
+                animatedUserCoordinate.latitude += deltaLat
+                animatedUserCoordinate.longitude += deltaLon
+            }
+        }
     }
     
     func routeBounds() -> CoordinateBounds {
