@@ -112,7 +112,7 @@ struct NavigationCard: View {
                         Text(buildingVM.name())
                             .font(.system(size: 18, weight: .bold))
                         Spacer()
-                        FavoritesButton(building: buildingVM.selectedBuilding ?? Building(abbr: "nil", name: "nil", photoURL: "nil"))
+                        FavoritesButton(building: buildingVM.selectedBuilding ?? Building(abbr: "", name: "", photoURL: ""))
                             .environmentObject(settingsManager)
                     }
                     .zIndex(1)
@@ -130,7 +130,6 @@ struct NavigationCard: View {
                 .padding()
                 .onChange(of: distance) {
                     displayTime = meters_to_time(meters: navigationVM.distance)
-                    navState.showNavigationCard = true
                 }
             }
         }

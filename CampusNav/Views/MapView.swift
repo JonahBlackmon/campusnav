@@ -38,7 +38,8 @@ var specialAbbrs: [String] = [
     "BSB",
     "BGH",
     "LS1",
-    "SEA"
+    "SEA",
+    "SJH"
 ]
 
 enum GeoJSONLayer : String {

@@ -197,5 +197,5 @@ extension NavigationViewModel: CLLocationManagerDelegate {
         guard let location = locations.last else { return }
         self.currentLocation = location.coordinate
     }
-
+    
 }
