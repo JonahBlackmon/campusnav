@@ -11,27 +11,20 @@ import CoreLocation
 
 @main
 struct CampusNavApp: App {
-    
-    @StateObject var settingsManager: SettingsManager = SettingsManager()
-    @StateObject var buildingManager: BuildingManager = BuildingManager()
-    @StateObject var directionManager: DirectionManager = DirectionManager(currentCoordinates: [], currentNodes: [])
+    @StateObject var navCoord: NavigationCoordinator = NavigationCoordinator()
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(buildingManager)
-                .environmentObject(settingsManager)
-                .environmentObject(directionManager)
+                .environmentObject(navCoord.buildingVM)
+                .environmentObject(navCoord.headerVM)
+                .environmentObject(navCoord.navState)
+                .environmentObject(navCoord.navigationVM)
+                .environmentObject(navCoord.settingsManager)
+                .environmentObject(navCoord)
                 .onAppear {
-                    buildingManager.loadBuildings(pathName: "buildings_simple")
+                    navCoord.buildingVM.loadBuildings(pathName: "buildings_simple")
                 }
         }
     }
-}
-
-#Preview {
-    ContentView()
-        .environmentObject(BuildingManager())
-        .environmentObject(SettingsManager())
-        .environmentObject(DirectionManager(currentCoordinates: [], currentNodes: []))
 }
 

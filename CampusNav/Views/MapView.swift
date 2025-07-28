@@ -11,17 +11,15 @@ import MapboxMaps
 import Turf
 
 struct MapView: View {
-    @Binding var coordinates: [CLLocationCoordinate2D]
-    @Binding var showNavigationCard: Bool
-    @Binding var selectedBuildingAbbr: String
-    @Binding var selectedDestinationName: String
-    @Binding var selectedPhotoURL: String
-    @Binding var navigating: Bool
-    @Binding var coordinate_nodes: [Node]
-    @Binding var directions: [DirectionStep]
+    @EnvironmentObject var navState: NavigationUIState
+    @EnvironmentObject var buildingVM: BuildingViewModel
+    @EnvironmentObject var navigationVM: NavigationViewModel
     let starting_position: MapCameraPosition = .region(.init(center: .init(latitude: 30.2850, longitude: -97.7335), latitudinalMeters: 1300, longitudinalMeters: 1300))
     var body: some View {
-        MapBoxMapView(coordinates: $coordinates, showNavigationCard: $showNavigationCard, selectedBuildingAbbr: $selectedBuildingAbbr, selectedDestinationName: $selectedDestinationName, selectedPhotoURL: $selectedPhotoURL, navigating: $navigating, coordinate_nodes: $coordinate_nodes, directions: $directions)
+        MapBoxMapView()
+            .environmentObject(navState)
+            .environmentObject(navigationVM)
+            .environmentObject(buildingVM)
     }
 }
 
@@ -40,7 +38,8 @@ var specialAbbrs: [String] = [
     "BSB",
     "BGH",
     "LS1",
-    "SEA"
+    "SEA",
+    "SJH"
 ]
 
 enum GeoJSONLayer : String {
@@ -50,7 +49,6 @@ enum GeoJSONLayer : String {
 }
 
 struct MapBoxMapView: View {
-    @Binding var coordinates: [CLLocationCoordinate2D]
     @State private var invertedSourceData: GeoJSONSourceData? = nil
     @State private var blockSourceData: GeoJSONSourceData? = nil
     @State private var buildingSourceData: GeoJSONSourceData? = nil
@@ -60,20 +58,15 @@ struct MapBoxMapView: View {
     @State var currentZoom: Double = 13.9
     @State private var bobbingOffset: CGFloat = 0
     
-    @Binding var showNavigationCard: Bool
-    @Binding var selectedBuildingAbbr: String
-    @Binding var selectedDestinationName: String
-    @Binding var selectedPhotoURL: String
-    @Binding var navigating: Bool
-    @Binding var coordinate_nodes: [Node]
-    @Binding var directions: [DirectionStep]
-    @EnvironmentObject var directionManager: DirectionManager
+    @EnvironmentObject var navState: NavigationUIState
+    @EnvironmentObject var navigationVM: NavigationViewModel
+    @EnvironmentObject var buildingVM: BuildingViewModel
     var body: some View {
         MapReader { proxy in
             Map(viewport: $viewport) {
                 // General route styling
                 PolylineAnnotationGroup() {
-                    PolylineAnnotation(lineCoordinates: coordinates)
+                    PolylineAnnotation(lineCoordinates: navigationVM.currentCoordinates)
                         .lineColor(.lightOrange)
                         .lineBorderColor(.burntOrange)
                         .lineWidth(10)
@@ -83,8 +76,8 @@ struct MapBoxMapView: View {
                     .slot(.middle)
                 
                 // Only draw the route once we have the coordinates we're navigating
-                if !coordinates.isEmpty {
-                    MapViewAnnotation(coordinate: coordinates.last!) {
+                if !navigationVM.currentCoordinates.isEmpty {
+                    MapViewAnnotation(coordinate: navigationVM.currentCoordinates.last!) {
                         // Image that controls the bobbing icon at the destination
                         Image("dest-pin")
                             .offset(y: bobbingOffset)
@@ -104,7 +97,7 @@ struct MapBoxMapView: View {
                 }
                 
                 // Draw the user location
-                MapViewAnnotation(coordinate: directionManager.currentLocation ?? CLLocationCoordinate2D(latitude: 30.287265, longitude: -97.737051)) {
+                MapViewAnnotation(coordinate: navigationVM.currentLocation ?? CLLocationCoordinate2D(latitude: 30.287265, longitude: -97.737051)) {
                     Circle()
                         .foregroundStyle(.red)
                 }
@@ -163,39 +156,41 @@ struct MapBoxMapView: View {
                 }
                 // If the building labels are visible, then allow the to be interactable
                 if currentZoom >= 15 {
-                    if !navigating {
+                    if !navState.isNavigating {
                         // Tap interaction for the area of each building via geojson polygons
                         TapInteraction(.layer("building-shapes")) { feature, context in
                             selectedFeature = feature // Currently selected
                             // Building exists in our navigation, it has an abbreviation
+                            var selectedName = ""
+                            var photoURL = ""
                             if case let .string(buildingAbbr)? = feature.properties["Building_Abbr"] {
-                                selectedBuildingAbbr = buildingAbbr
                                 if case let .string(destinationName)? = feature.properties["Description"] {
-                                    selectedDestinationName = destinationName
+                                    selectedName = destinationName
                                 } else {
                                     // If there is no name, abbreviate it
-                                    selectedDestinationName = selectedBuildingAbbr
+                                    selectedName = buildingAbbr
                                 }
                                 // Optional image from UT's data set
                                 if case let .string(rawHTML)? = feature.properties["Photo_URL"] {
-                                    selectedPhotoURL = rawHTML.contains("src=")
+                                    photoURL = rawHTML.contains("src=")
                                     ? rawHTML.components(separatedBy: "src=").last?.trimmingCharacters(in: CharacterSet(charactersIn: ">\"")) ?? ""
                                     : rawHTML
                                 }
                                 // Can we navigate here?
-                                let exists = nodes.contains { $0.abbr == selectedBuildingAbbr }
+                                let exists = nodes.contains { $0.abbr == buildingAbbr }
                                 if exists {
                                     // Is it an actual building?
                                     guard let polygon = feature.geometry.polygon else {
                                         print("Non-polygon geometry")
-                                        showNavigationCard = true
+                                        navState.showNavigationCard = true
                                         return false
                                     }
+                                    buildingVM.selectedBuilding = Building(abbr: buildingAbbr, name: selectedName, photoURL: photoURL)
                                     withViewportAnimation(.easeInOut(duration: 0.5)) {
                                         viewport = Viewport.camera(center: polygon.center, zoom: 16.5)
                                     }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                                        showNavigationCard = true
+                                        navState.showNavigationCard = true
                                     }
                                 } else {
                                     resetSelected()
@@ -203,7 +198,7 @@ struct MapBoxMapView: View {
                             } else {
                                 resetSelected()
                             }
-                            return selectedPhotoURL.isEmpty || specialAbbrs.contains(selectedBuildingAbbr)
+                            return buildingVM.url().isEmpty || specialAbbrs.contains(buildingVM.abbr())
                         }
                     }
                 } else {
@@ -258,15 +253,13 @@ struct MapBoxMapView: View {
                 loadGeoJSON(url: "UT_Campus_Block", layer: .block)
                 loadGeoJSON(url: "buildings_simple", layer: .building)
             }
-            .onChange(of: navigating) {
-                if navigating {
+            .onChange(of: navState.isNavigating) {
+                if navState.isNavigating {
                     withViewportAnimation(.default(maxDuration: 1)) {
                         viewport = Viewport.camera(center: centerOfRoute(bounds: routeBounds()), zoom: 14.75)
                     }
-                    directionManager.currentCoordinates = coordinates
-                    directionManager.currentNodes = coordinate_nodes
                     withAnimation(.easeOut(duration: 0.3)) {
-                        directions = directionManager.getDirections(destAbbr: coordinate_nodes.last?.abbr ?? "")
+                        navigationVM.directions = navigationVM.getDirections(destAbbr: navigationVM.currentNodes.last?.abbr ?? "")
                     }
                 }
             }
@@ -275,12 +268,12 @@ struct MapBoxMapView: View {
     }
     
     func routeBounds() -> CoordinateBounds {
-        var minLat = coordinates[0].latitude
-        var minLng = coordinates[0].longitude
-        var maxLat = coordinates[0].latitude
-        var maxLng = coordinates[0].longitude
+        var minLat = navigationVM.currentCoordinates[0].latitude
+        var minLng = navigationVM.currentCoordinates[0].longitude
+        var maxLat = navigationVM.currentCoordinates[0].latitude
+        var maxLng = navigationVM.currentCoordinates[0].longitude
         
-        for coord in coordinates {
+        for coord in navigationVM.currentCoordinates {
             if coord.latitude > maxLat {
                 maxLat = coord.latitude
             } else if coord.latitude < minLat {
@@ -298,13 +291,6 @@ struct MapBoxMapView: View {
     func centerOfRoute(bounds: CoordinateBounds) -> CLLocationCoordinate2D {
         return CLLocationCoordinate2D(latitude: (bounds.southwest.latitude + bounds.northeast.latitude) / 2,
                                       longitude: (bounds.southwest.longitude + bounds.northeast.longitude) / 2)
-    }
-    
-    struct Building: Identifiable {
-        let id = UUID()
-        let abbr: String
-        let name: String
-        let photoURL: String
     }
     
     // Loads all geojson data to enable tap interactions for the map
@@ -343,15 +329,9 @@ struct MapBoxMapView: View {
     
     // Resets all values to their null values
     private func resetSelected() {
-        showNavigationCard = false
+        navState.showNavigationCard = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            selectedBuildingAbbr = ""
-            selectedDestinationName = ""
-            selectedPhotoURL = ""
+            buildingVM.selectedBuilding = nil
         }
     }
 }
-
-//#Preview {
-//    ContentView()
-//}

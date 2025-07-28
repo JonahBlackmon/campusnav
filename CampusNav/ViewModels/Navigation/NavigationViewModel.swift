@@ -9,43 +9,34 @@ import SwiftUI
 import MapKit
 import CoreLocation
 
-enum WalkingDirection: Equatable {
-    case forward, backward, left, right
-    var description: String {
-        switch self {
-        case .forward: return "arrow.turn.right.up"
-        case .backward: return "arrow.uturn.down"
-        case .left: return "arrow.turn.up.left"
-        case .right: return "arrow.turn.up.right"
-        }
-    }
-}
-
-struct DirectionStep: Equatable, Identifiable {
-    var id = UUID()
-    let label: String
-    let distance: String
-    let direction: WalkingDirection?
-}
-
-
-class DirectionManager: NSObject, ObservableObject {
+class NavigationViewModel: NSObject, ObservableObject {
     
     private var locationManager: CLLocationManager?
+    
     @Published var log: String = ""
     
     @Published var currentDirection: CLLocationDirection?
     
     @Published var currentLocation: CLLocationCoordinate2D?
     
-    var currentCoordinates: [CLLocationCoordinate2D]
-    var currentNodes: [Node]
+    @Published var currentCoordinates: [CLLocationCoordinate2D]
+    
+    @Published var directions: [DirectionStep]
+    
+    @Published var distance: Double
+    
+    @Published var currentNodes: [Node]
+    
+    var proximityTimer: Timer?
     
     init(currentCoordinates: [CLLocationCoordinate2D], currentNodes: [Node], locationManager: CLLocationManager = CLLocationManager()) {
         self.currentCoordinates = currentCoordinates
         self.currentNodes = currentNodes
-        super.init()
         self.locationManager = locationManager
+        self.directions = []
+        self.distance = -1.0
+        self.proximityTimer = nil
+        super.init()
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingHeading()
@@ -177,7 +168,7 @@ class DirectionManager: NSObject, ObservableObject {
 }
 
 
-extension DirectionManager: CLLocationManagerDelegate {
+extension NavigationViewModel: CLLocationManagerDelegate {
     
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         switch manager.authorizationStatus {
@@ -206,5 +197,5 @@ extension DirectionManager: CLLocationManagerDelegate {
         guard let location = locations.last else { return }
         self.currentLocation = location.coordinate
     }
-
+    
 }
