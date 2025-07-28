@@ -13,6 +13,7 @@ struct SettingsView: View {
     @EnvironmentObject var buildingVM: BuildingViewModel
     var collegePrimary: Color
     var collegeSecondary: Color
+    @FocusState.Binding var searchFocused: Bool
     var body: some View {
         Color.black.opacity(0.8)
             .ignoresSafeArea()
@@ -44,13 +45,14 @@ struct SettingsButton: View {
     @EnvironmentObject var navState: NavigationUIState
     let collegePrimary: Color
     let collegeSecondary: Color
+    @FocusState.Binding var searchFocused: Bool
     var body: some View {
         Button {
             withAnimation(.easeInOut(duration: 0.3)) {
                 navState.isSearching = false
                 headerVM.animateFavorites = false
                 headerVM.showFavorites = false
-                headerVM.searchFocused = false
+                searchFocused = false
                 headerVM.animateSettings.toggle()
                 headerVM.showSettings.toggle()
             }

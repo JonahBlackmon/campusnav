@@ -6,6 +6,7 @@ struct HeaderView: View {
     @State var animateFavorites: Bool = false    
     var collegePrimary: Color
     var collegeSecondary: Color
+    @FocusState var searchFocused: Bool
     @EnvironmentObject var headerVM: HeaderViewModel
     @EnvironmentObject var navState: NavigationUIState
     @EnvironmentObject var buildingVM: BuildingViewModel
@@ -13,7 +14,7 @@ struct HeaderView: View {
     var body: some View {
         ZStack {
             if navState.isSearching {
-                SearchView(collegePrimary: collegePrimary, collegeSecondary: collegeSecondary)
+                SearchView(collegePrimary: collegePrimary, collegeSecondary: collegeSecondary, searchFocused: $searchFocused)
                     .environmentObject(headerVM)
                     .environmentObject(navState)
                     .environmentObject(buildingVM)
@@ -26,24 +27,24 @@ struct HeaderView: View {
                     .environmentObject(headerVM)
             }
             if headerVM.showSettings {
-                SettingsView(collegePrimary: collegePrimary, collegeSecondary: collegeSecondary)
+                SettingsView(collegePrimary: collegePrimary, collegeSecondary: collegeSecondary, searchFocused: $searchFocused)
                     .environmentObject(navState)
                     .environmentObject(buildingVM)
                     .environmentObject(settingsManager)
                     .environmentObject(headerVM)
             }
             ZStack {
-                SearchButton(collegePrimary: collegePrimary, collegeSecondary: collegeSecondary)
+                SearchButton(searchFocused: $searchFocused, collegePrimary: collegePrimary, collegeSecondary: collegeSecondary)
                     .environmentObject(headerVM)
                     .environmentObject(navState)
                     .offset(y: navState.isNavigating ? -200 : 0)
                 HStack {
-                    SettingsButton(collegePrimary: collegePrimary, collegeSecondary: collegeSecondary)
+                    SettingsButton(collegePrimary: collegePrimary, collegeSecondary: collegeSecondary, searchFocused: $searchFocused)
                         .environmentObject(headerVM)
                         .environmentObject(navState)
                         .offset(x: navState.isSearching || navState.isNavigating ? -200 : 0)
                     Spacer()
-                    FavoritesIconButton(collegePrimary: collegePrimary, collegeSecondary: collegeSecondary)
+                    FavoritesIconButton(collegePrimary: collegePrimary, collegeSecondary: collegeSecondary, searchFocused: $searchFocused)
                         .environmentObject(headerVM)
                         .environmentObject(navState)
                         .offset(x: navState.isSearching || navState.isNavigating ? 200 : 0)

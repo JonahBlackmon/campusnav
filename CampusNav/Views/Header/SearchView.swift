@@ -13,7 +13,7 @@ struct SearchView: View {
     @EnvironmentObject var buildingVM: BuildingViewModel
     @EnvironmentObject var settingsManager: SettingsManager
     @EnvironmentObject var headerVM: HeaderViewModel
-    
+    @FocusState.Binding var searchFocused: Bool
     @State var displayBuildings: [Building] = []
     var favorites: [Building] { Array(settingsManager.favorites.values) }
     var nonFavoritePopular: [Building] { buildingVM.popularBuildings.filter { !settingsManager.favorites.keys.contains($0.abbr) } }
@@ -25,7 +25,7 @@ struct SearchView: View {
                 .ignoresSafeArea()
                 .transition(.opacity)
                 .onTapGesture {
-                    headerVM.searchFocused = false
+                   searchFocused = false
                 }
             ScrollView {
                 VStack(spacing: 10) {
@@ -36,7 +36,7 @@ struct SearchView: View {
                                     collegePrimary: collegePrimary,
                                     index: index,
                                     onSelect: {
-                                        headerVM.ExitHeader(navState: navState)
+                                        headerVM.ExitHeader(navState: navState, searchFocused: $searchFocused)
                                         navState.showNavigationCard = true
                                         buildingVM.selectedBuilding = building
                                     }
@@ -104,6 +104,7 @@ struct SearchItem: View {
 struct SearchButton: View {
     @EnvironmentObject var headerVM: HeaderViewModel
     @EnvironmentObject var navState: NavigationUIState
+    @FocusState.Binding var searchFocused: Bool
     let collegePrimary: Color
     let collegeSecondary: Color
     var body: some View {
@@ -115,7 +116,7 @@ struct SearchButton: View {
                 headerVM.showFavorites = false
                 navState.isSearching = true
                 navState.isSearching = true
-                headerVM.searchFocused = true
+                searchFocused = true
             }
         } label: {
             HStack(spacing: 20) {
@@ -162,13 +163,13 @@ struct SearchButton: View {
             if navState.isSearching {
                 TextField(
                     "",
-                    text: headerVM.$searchText,
+                    text: $headerVM.searchText,
                     prompt: Text("E.g. PCL...")
                         .foregroundColor(.offWhite.opacity(0.8))
                         .italic()
                 )
                 .multilineTextAlignment(.leading)
-                .focused(headerVM.$searchFocused)
+                .focused($searchFocused)
                 .transition(.opacity.combined(with: .move(edge: .trailing)))
             }
         }
@@ -176,7 +177,7 @@ struct SearchButton: View {
     
     private var BackButton: some View {
         Button {
-            headerVM.ExitHeader(navState: navState)
+            headerVM.ExitHeader(navState: navState, searchFocused: $searchFocused)
         } label: {
             Image(systemName: "chevron.backward")
                 .foregroundStyle(.black.opacity(0.3))

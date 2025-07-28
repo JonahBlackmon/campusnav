@@ -108,13 +108,14 @@ struct FavoritesIconButton: View {
     @EnvironmentObject var navState: NavigationUIState
     let collegePrimary: Color
     let collegeSecondary: Color
+    @FocusState.Binding var searchFocused: Bool
     var body: some View {
         Button {
             withAnimation(.easeInOut(duration: 0.3)) {
                 navState.isSearching = false
                 headerVM.showSettings = false
                 headerVM.animateSettings = false
-                headerVM.searchFocused = false
+                searchFocused = false
                 headerVM.animateFavorites.toggle()
                 headerVM.showFavorites.toggle()
             }
