@@ -36,7 +36,7 @@ struct SearchView: View {
                                     collegePrimary: collegePrimary,
                                     index: index,
                                     onSelect: {
-                                        headerVM.ExitHeader(navState: navState, searchFocused: $searchFocused)
+                                        searchFocused = headerVM.ExitHeader(navState: navState)
                                         navState.showNavigationCard = true
                                         buildingVM.selectedBuilding = building
                                     }
@@ -177,7 +177,7 @@ struct SearchButton: View {
     
     private var BackButton: some View {
         Button {
-            headerVM.ExitHeader(navState: navState, searchFocused: $searchFocused)
+            searchFocused = headerVM.ExitHeader(navState: navState)
         } label: {
             Image(systemName: "chevron.backward")
                 .foregroundStyle(.black.opacity(0.3))

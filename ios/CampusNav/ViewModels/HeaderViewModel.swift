@@ -14,17 +14,17 @@ class HeaderViewModel: ObservableObject {
     @Published var searchText: String = ""
 //    @FocusState var searchFocused: Bool
     
-    func ExitHeader(navState: NavigationUIState, searchFocused: FocusState<Bool>.Binding) {
+    func ExitHeader(navState: NavigationUIState) -> Bool {
         withAnimation(.easeInOut(duration: 0.3)) {
             navState.isSearching = false
             showSettings = false
             animateSettings = false
             animateFavorites = false
             showFavorites = false
-//            searchFocused = false
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.searchText = ""
         }
+        return false
     }
 }
