@@ -11,6 +11,7 @@ struct Keys {
     static let CollegePrimary = "CollegePrimary"
     static let CollegeSecondary = "CollegeSecondary"
     static let Favorites = "Favorites"
+    static let Events = "Events"
 }
 
 let Colors: [String: Color] = ["burntOrange" : Color.burntOrange, "offWhite" : Color.offWhite,
@@ -30,13 +31,22 @@ class SettingsManager: ObservableObject {
     
     @Published var favorites: [String : Building] = [:]
     
+    @Published var events: [String : Event] = [:]
+    
     init() {
         do {
-            if var savedData = self.defaults.object(forKey: Keys.Favorites) as? Data {
+            if var favoritesData = self.defaults.object(forKey: Keys.Favorites) as? Data {
                 do {
-                    favorites = try JSONDecoder().decode([String : Building].self, from: savedData)
+                    favorites = try JSONDecoder().decode([String : Building].self, from: favoritesData)
                 } catch {
                     print("Error loading favorites: \(error)")
+                }
+            }
+            if var eventsData = self.defaults.object(forKey: Keys.Events) as? Data {
+                do {
+                    events = try JSONDecoder().decode([String : Event].self, from: eventsData)
+                } catch {
+                    print("Error loading events: \(error)")
                 }
             }
         }
@@ -56,6 +66,21 @@ class SettingsManager: ObservableObject {
     func updateCollegeColors(collegePrimary: String, collegeSecondary: String) {
         defaults.set(collegePrimary, forKey: Keys.CollegePrimary)
         defaults.set(collegeSecondary, forKey: Keys.CollegeSecondary)
+    }
+    
+    func writeEvent(_ event: Event, ref: String) {
+        events[ref] = event
+        do {
+            try defaults.set(JSONEncoder().encode(events), forKey: Keys.Events)
+        } catch {
+            print("Error setting events: \(error)")
+        }
+    }
+    
+    func removeEvent(ref: String) {
+        if events[ref] != nil {
+            events.removeValue(forKey: ref)
+        }
     }
     
     func writeFavorites(_ favorite: Building, abbr: String) {

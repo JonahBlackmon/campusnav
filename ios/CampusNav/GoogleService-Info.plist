@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyAyh-bFCfMkuaA9yAD7aM6QArkKOrm2SPg</string>
+	<key>GCM_SENDER_ID</key>
+	<string>742134369357</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>JonahBlackmon.CampusNav</string>
+	<key>PROJECT_ID</key>
+	<string>campusnav-c0fcb</string>
+	<key>STORAGE_BUCKET</key>
+	<string>campusnav-c0fcb.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:742134369357:ios:b24c5030aabd06bcc82004</string>
+</dict>
+</plist>

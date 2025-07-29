@@ -16,6 +16,7 @@ struct ContentView: View {
     @EnvironmentObject var navState: NavigationUIState
     @EnvironmentObject var navCoord: NavigationCoordinator
     @EnvironmentObject var headerVM: HeaderViewModel
+    @EnvironmentObject var firebaseManager: FirebaseManager
     
     let tabBar: [(String, String)] = [("record", "mic.fill"), ("home", "house.fill"), ("profile", "book.fill")]
     
@@ -55,6 +56,32 @@ struct ContentView: View {
             }
         }
     }
+    
+//    private var addEvent: some View {
+//        VStack {
+//            Button {
+//                firebaseManager.publishEvent(abbr: "KIN", locationDescription: "", clubName: "", eventName: "", eventTimes: [Date.now], isRepeating: false, settingsManager: settingsManager)
+//            } label: {
+//                Text("Add Event")
+//            }
+//            myEvents
+//        }
+//        .background(Color.white)
+//    }
+//    
+//    private var myEvents: some View {
+//        VStack {
+//            ScrollView {
+//                ForEach(Array(settingsManager.events.keys.enumerated()), id: \.element) { index, key in
+//                    Button {
+//                        firebaseManager.deleteEvent(ref: key, settingsManager: settingsManager)
+//                    } label: {
+//                        Text(key)
+//                    }
+//                }
+//            }
+//        }
+//    }
     
     private var cardView: some View {
         ZStack {
