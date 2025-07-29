@@ -139,9 +139,25 @@ struct MapBoxMapView: View {
                     
                     SymbolLayer(id: "building-labels", source: "ut-buildings")
                         .textField(Exp(.get) { "Building_Abbr" })
-                        .textColor(StyleColor(.darkGray))
+                        .textColor(
+                            Exp(.match) {
+                                Exp(.get) { "Building_Abbr" }
+                                specialAbbrs
+                                UIColor.offWhite
+                                UIColor.darkGray
+                            }
+                        )
                         .textSize(7)
                         .textFont(["Open Sans Bold"])
+                        .textHaloColor(StyleColor(.burntOrange))
+                        .textHaloWidth(
+                            Exp(.match) {
+                                Exp(.get) { "Building_Abbr" }
+                                specialAbbrs
+                                1.0
+                                0.0
+                            }
+                        )
                         .textOpacity(currentZoom >= 15 ? 1.0 : 0.0)
                         .textAllowOverlap(true)
                         .filter(Exp(.eq) {

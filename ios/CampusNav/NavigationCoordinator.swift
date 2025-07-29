@@ -19,12 +19,15 @@ class NavigationCoordinator: ObservableObject {
     
     @Published var settingsManager: SettingsManager
     
+    @Published var firebaseManager: FirebaseManager
+    
     init() {
         self.navigationVM = NavigationViewModel(currentCoordinates: [], currentNodes: [])
         self.buildingVM = BuildingViewModel()
         self.navState = NavigationUIState()
         self.headerVM = HeaderViewModel()
         self.settingsManager = SettingsManager()
+        self.firebaseManager = FirebaseManager()
     }
     
     // Resets all accessed values to their default
