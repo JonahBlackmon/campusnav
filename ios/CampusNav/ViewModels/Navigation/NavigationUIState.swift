@@ -7,9 +7,10 @@
 import SwiftUI
 
 class NavigationUIState: ObservableObject {
-    @Published var currentView: String = "record"
+    @Published var currentView: String = "Map"
     @Published var showNavigationCard = false
     @Published var showArrival = false
     @Published var isNavigating = false
     @Published var isSearching = false
+    @Published var events = false
 }

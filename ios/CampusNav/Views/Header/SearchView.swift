@@ -39,7 +39,8 @@ struct SearchView: View {
                                         searchFocused = headerVM.ExitHeader(navState: navState)
                                         navState.showNavigationCard = true
                                         buildingVM.selectedBuilding = building
-                                    }
+                                    },
+                                    tintColor: .black
                                 )
                     }
                 }
@@ -67,7 +68,7 @@ struct SearchItem: View {
     let collegePrimary: Color
     let index: Int
     let onSelect: () -> Void
-    
+    let tintColor: Color
     @State var show: Bool = false
     
     var body: some View {
@@ -78,13 +79,16 @@ struct SearchItem: View {
                 Image(systemName: "location.circle.fill")
                 .font(.system(size: 22))
                 .padding(.trailing, 5)
+                .foregroundStyle(tintColor)
                 VStack(alignment: .leading) {
                     Text(building.name)
                         .font(.system(size: 20))
+                        .foregroundStyle(tintColor)
                     Text(building.abbr)
                         .font(.system(size: 10))
                         .foregroundStyle(collegePrimary)
                     Divider()
+                        .overlay(tintColor)
                 }
             }
             .foregroundStyle(.black.opacity(0.8))

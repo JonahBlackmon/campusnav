@@ -13,6 +13,7 @@
 		E8CD6FBB2E3847FC00B71633 /* FirebaseAnalyticsIdentitySupport in Frameworks */ = {isa = PBXBuildFile; productRef = E8CD6FBA2E3847FC00B71633 /* FirebaseAnalyticsIdentitySupport */; };
 		E8CD6FBD2E3847FC00B71633 /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = E8CD6FBC2E3847FC00B71633 /* FirebaseAppCheck */; };
 		E8CD6FC22E38493000B71633 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = E8CD6FC12E38493000B71633 /* FirebaseFirestore */; };
+		E8CD70272E39746B00B71633 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = E8CD70262E39746B00B71633 /* SDWebImageSwiftUI */; };
 		E8F6A6512E257FB500E68A5A /* ArcGIS in Frameworks */ = {isa = PBXBuildFile; productRef = E8F6A6502E257FB500E68A5A /* ArcGIS */; };
 		E8F6A6542E25806900E68A5A /* ArcGISToolkit in Frameworks */ = {isa = PBXBuildFile; productRef = E8F6A6532E25806900E68A5A /* ArcGISToolkit */; };
 		E8F6A65D2E25B92C00E68A5A /* MapboxMaps in Frameworks */ = {isa = PBXBuildFile; productRef = E8F6A65C2E25B92C00E68A5A /* MapboxMaps */; };
@@ -57,6 +58,7 @@
 				E8F6A6542E25806900E68A5A /* ArcGISToolkit in Frameworks */,
 				E8F6A6E92E2F48CA00E68A5A /* Modals in Frameworks */,
 				E8CD6FB92E3847FC00B71633 /* FirebaseAnalyticsCore in Frameworks */,
+				E8CD70272E39746B00B71633 /* SDWebImageSwiftUI in Frameworks */,
 				E8CD6FBD2E3847FC00B71633 /* FirebaseAppCheck in Frameworks */,
 				E8F6A6512E257FB500E68A5A /* ArcGIS in Frameworks */,
 			);
@@ -119,6 +121,7 @@
 				E8CD6FBA2E3847FC00B71633 /* FirebaseAnalyticsIdentitySupport */,
 				E8CD6FBC2E3847FC00B71633 /* FirebaseAppCheck */,
 				E8CD6FC12E38493000B71633 /* FirebaseFirestore */,
+				E8CD70262E39746B00B71633 /* SDWebImageSwiftUI */,
 			);
 			productName = CampusNav;
 			productReference = E82A5BBA2E22E60A00CD5C87 /* CampusNav.app */;
@@ -154,6 +157,7 @@
 				E8F6A65B2E25B92C00E68A5A /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */,
 				E8F6A6E72E2F48CA00E68A5A /* XCRemoteSwiftPackageReference "Modals" */,
 				E8CD6FB32E3846F200B71633 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				E8CD70252E39746B00B71633 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E82A5BBB2E22E60A00CD5C87 /* Products */;
@@ -399,6 +403,14 @@
 				minimumVersion = 12.0.0;
 			};
 		};
+		E8CD70252E39746B00B71633 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.3;
+			};
+		};
 		E8F6A64F2E257FB500E68A5A /* XCRemoteSwiftPackageReference "arcgis-maps-sdk-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Esri/arcgis-maps-sdk-swift";
@@ -463,6 +475,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E8CD6FB32E3846F200B71633 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
+		};
+		E8CD70262E39746B00B71633 /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E8CD70252E39746B00B71633 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
 		};
 		E8F6A6502E257FB500E68A5A /* ArcGIS */ = {
 			isa = XCSwiftPackageProductDependency;

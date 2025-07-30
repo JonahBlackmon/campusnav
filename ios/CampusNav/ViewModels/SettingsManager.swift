@@ -31,7 +31,7 @@ class SettingsManager: ObservableObject {
     
     @Published var favorites: [String : Building] = [:]
     
-    @Published var events: [String : Event] = [:]
+    @Published var events: [String : LocalEvent] = [:]
     
     init() {
         do {
@@ -44,7 +44,7 @@ class SettingsManager: ObservableObject {
             }
             if var eventsData = self.defaults.object(forKey: Keys.Events) as? Data {
                 do {
-                    events = try JSONDecoder().decode([String : Event].self, from: eventsData)
+                    events = try JSONDecoder().decode([String : LocalEvent].self, from: eventsData)
                 } catch {
                     print("Error loading events: \(error)")
                 }
@@ -68,7 +68,7 @@ class SettingsManager: ObservableObject {
         defaults.set(collegeSecondary, forKey: Keys.CollegeSecondary)
     }
     
-    func writeEvent(_ event: Event, ref: String) {
+    func writeEvent(_ event: LocalEvent, ref: String) {
         events[ref] = event
         do {
             try defaults.set(JSONEncoder().encode(events), forKey: Keys.Events)
@@ -78,8 +78,13 @@ class SettingsManager: ObservableObject {
     }
     
     func removeEvent(ref: String) {
-        if events[ref] != nil {
-            events.removeValue(forKey: ref)
+        if events.removeValue(forKey: ref) != nil {
+            do {
+                let data = try JSONEncoder().encode(events)
+                defaults.set(data, forKey: Keys.Events)
+            } catch {
+                print("Error saving events after removal: \(error)")
+            }
         }
     }
     

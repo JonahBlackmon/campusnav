@@ -13,7 +13,7 @@ class FirebaseManager: ObservableObject {
     
     // Save published events to users UserDefaults and use that for storing what user made what
     func publishEvent(abbr: String, locationDescription: String?, clubName: String?,
-                      eventName: String?, eventTimes: [Date?], isRepeating: Bool, settingsManager: SettingsManager) {
+                      eventName: String?, eventTimes: [String], isRepeating: Bool, settingsManager: SettingsManager) {
         let event = Event(
             abbr: abbr,
             location_description: locationDescription,
@@ -26,7 +26,9 @@ class FirebaseManager: ObservableObject {
         do {
             let ref = try eventCollection.addDocument(from: event)
             print("Document added with new reference: \(ref)")
-            settingsManager.writeEvent(event, ref: ref.documentID)
+            var localEvent: LocalEvent = event.toLocal()
+            localEvent.id = ref.documentID
+            settingsManager.writeEvent(localEvent, ref: ref.documentID)
         } catch {
             print("Error adding document: \(error)")
         }
@@ -35,6 +37,20 @@ class FirebaseManager: ObservableObject {
     func deleteEvent(ref: String, settingsManager: SettingsManager) {
         eventCollection.document(ref).delete()
         settingsManager.removeEvent(ref: ref)
+    }
+    
+    func getEvents() async -> [Event] {
+        var events: [Event] = []
+        do {
+            try await events = eventCollection
+                .getDocuments()
+                .documents.compactMap() { document in
+                    try? document.data(as: Event.self)
+                }
+        } catch {
+            print("Error getting events: \(error)")
+        }
+        return events
     }
     
 }

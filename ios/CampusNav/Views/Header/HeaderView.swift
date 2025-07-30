@@ -37,17 +37,17 @@ struct HeaderView: View {
                 SearchButton(searchFocused: $searchFocused, collegePrimary: collegePrimary, collegeSecondary: collegeSecondary)
                     .environmentObject(headerVM)
                     .environmentObject(navState)
-                    .offset(y: navState.isNavigating ? -200 : 0)
+                    .offset(y: navState.isNavigating || navState.events ? -200 : 0)
                 HStack {
                     SettingsButton(collegePrimary: collegePrimary, collegeSecondary: collegeSecondary, searchFocused: $searchFocused)
                         .environmentObject(headerVM)
                         .environmentObject(navState)
-                        .offset(x: navState.isSearching || navState.isNavigating ? -200 : 0)
+                        .offset(x: navState.isSearching || navState.isNavigating || navState.events ? -200 : 0)
                     Spacer()
                     FavoritesIconButton(collegePrimary: collegePrimary, collegeSecondary: collegeSecondary, searchFocused: $searchFocused)
                         .environmentObject(headerVM)
                         .environmentObject(navState)
-                        .offset(x: navState.isSearching || navState.isNavigating ? 200 : 0)
+                        .offset(x: navState.isSearching || navState.isNavigating || navState.events ? 200 : 0)
                 }
             }
             .frame(maxHeight: .infinity, alignment: .top)

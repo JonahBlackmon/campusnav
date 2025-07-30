@@ -12,7 +12,6 @@ class HeaderViewModel: ObservableObject {
     @Published var showSettings: Bool = false
     @Published var showFavorites: Bool = false
     @Published var searchText: String = ""
-//    @FocusState var searchFocused: Bool
     
     func ExitHeader(navState: NavigationUIState) -> Bool {
         withAnimation(.easeInOut(duration: 0.3)) {

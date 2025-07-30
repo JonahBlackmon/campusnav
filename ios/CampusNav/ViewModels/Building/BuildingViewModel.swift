@@ -83,4 +83,9 @@ class BuildingViewModel: ObservableObject {
         }
     }
     
+    // Should only be called on verified abbr's
+    func selectBuilding(abbr: String) -> Building? {
+        return buildingList.filter{ $0.abbr == abbr }.first
+    }
+    
 }

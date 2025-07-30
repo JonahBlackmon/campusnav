@@ -17,8 +17,9 @@ struct ContentView: View {
     @EnvironmentObject var navCoord: NavigationCoordinator
     @EnvironmentObject var headerVM: HeaderViewModel
     @EnvironmentObject var firebaseManager: FirebaseManager
+    @EnvironmentObject var eventVM: EventViewModel
     
-    let tabBar: [(String, String)] = [("record", "mic.fill"), ("home", "house.fill"), ("profile", "book.fill")]
+    let tabBar: [(String, String)] = [("Map", "map"), ("Events", "events")]
     
     var collegePrimary: Color {
        return settingsManager.collegePrimary
@@ -55,6 +56,17 @@ struct ContentView: View {
                 navigationVM.proximityTimer = nil
             }
         }
+        .onChange(of: navState.currentView) {
+            let events: Bool = navState.currentView == "Events"
+            withAnimation(.easeInOut(duration: 0.3)) {
+                navState.events = events
+            }
+            if !events {
+                eventVM.ExitEvent()
+            } else {
+                headerVM.ExitHeader(navState: navState)
+            }
+        }
     }
     
 //    private var addEvent: some View {
@@ -67,20 +79,6 @@ struct ContentView: View {
 //            myEvents
 //        }
 //        .background(Color.white)
-//    }
-//    
-//    private var myEvents: some View {
-//        VStack {
-//            ScrollView {
-//                ForEach(Array(settingsManager.events.keys.enumerated()), id: \.element) { index, key in
-//                    Button {
-//                        firebaseManager.deleteEvent(ref: key, settingsManager: settingsManager)
-//                    } label: {
-//                        Text(key)
-//                    }
-//                }
-//            }
-//        }
 //    }
     
     private var cardView: some View {
@@ -126,20 +124,27 @@ struct ContentView: View {
     @ViewBuilder
     private var currentViewContent: some View {
         switch navState.currentView {
-        case "record", "explore":
+        case "Map":
             MapView()
                 .environmentObject(buildingVM)
                 .environmentObject(navigationVM)
                 .environmentObject(navState)
+                .environmentObject(eventVM)
                 .ignoresSafeArea()
                 .preferredColorScheme(.light)
-        case "profile":
-            Text("Hello World")
+        case "Events":
+            EventView(collegePrimary: collegePrimary, collegeSecondary: collegeSecondary)
+                .environmentObject(buildingVM)
+                .environmentObject(eventVM)
+                .environmentObject(navState)
+                .environmentObject(firebaseManager)
+                .environmentObject(settingsManager)
         default:
             MapView()
                 .environmentObject(buildingVM)
                 .environmentObject(navigationVM)
                 .environmentObject(navState)
+                .environmentObject(eventVM)
                 .ignoresSafeArea()
                 .preferredColorScheme(.light)
         }

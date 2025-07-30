@@ -14,12 +14,14 @@ struct MapView: View {
     @EnvironmentObject var navState: NavigationUIState
     @EnvironmentObject var buildingVM: BuildingViewModel
     @EnvironmentObject var navigationVM: NavigationViewModel
+    @EnvironmentObject var eventVM: EventViewModel
     let starting_position: MapCameraPosition = .region(.init(center: .init(latitude: 30.2850, longitude: -97.7335), latitudinalMeters: 1300, longitudinalMeters: 1300))
     var body: some View {
         MapBoxMapView()
             .environmentObject(navState)
             .environmentObject(navigationVM)
             .environmentObject(buildingVM)
+            .environmentObject(eventVM)
     }
 }
 
@@ -61,6 +63,7 @@ struct MapBoxMapView: View {
     @EnvironmentObject var navState: NavigationUIState
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var buildingVM: BuildingViewModel
+    @EnvironmentObject var eventVM: EventViewModel
     var body: some View {
         MapReader { proxy in
             Map(viewport: $viewport) {
@@ -142,7 +145,7 @@ struct MapBoxMapView: View {
                         .textColor(
                             Exp(.match) {
                                 Exp(.get) { "Building_Abbr" }
-                                specialAbbrs
+                                eventVM.eventBuildingAbbr
                                 UIColor.offWhite
                                 UIColor.darkGray
                             }
@@ -153,7 +156,7 @@ struct MapBoxMapView: View {
                         .textHaloWidth(
                             Exp(.match) {
                                 Exp(.get) { "Building_Abbr" }
-                                specialAbbrs
+                                eventVM.eventBuildingAbbr
                                 1.0
                                 0.0
                             }

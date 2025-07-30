@@ -21,6 +21,8 @@ class NavigationCoordinator: ObservableObject {
     
     @Published var firebaseManager: FirebaseManager
     
+    @Published var eventVM: EventViewModel
+    
     init() {
         self.navigationVM = NavigationViewModel(currentCoordinates: [], currentNodes: [])
         self.buildingVM = BuildingViewModel()
@@ -28,6 +30,7 @@ class NavigationCoordinator: ObservableObject {
         self.headerVM = HeaderViewModel()
         self.settingsManager = SettingsManager()
         self.firebaseManager = FirebaseManager()
+        self.eventVM = EventViewModel()
     }
     
     // Resets all accessed values to their default

@@ -14,6 +14,7 @@ struct SettingsView: View {
     var collegePrimary: Color
     var collegeSecondary: Color
     @FocusState.Binding var searchFocused: Bool
+    
     var body: some View {
         Color.black.opacity(0.8)
             .ignoresSafeArea()
