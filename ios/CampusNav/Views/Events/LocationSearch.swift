@@ -10,12 +10,12 @@ struct LocationSearch: View {
     @Binding var eventSearchText: String
     @State var displayBuildings: [Building] = []
     @FocusState.Binding var locationSearchFocus: Bool
-    var collegePrimary: Color
     @Binding var selectedBuilding: Building?
     @EnvironmentObject var buildingVM: BuildingViewModel
+    @EnvironmentObject var settingsManager: SettingsManager
     var body: some View {
         ZStack() {
-            Color.offWhite.opacity(0.001)
+            settingsManager.primaryColor.opacity(0.001)
                 .ignoresSafeArea()
                 .transition(.opacity)
                 .onTapGesture {
@@ -27,14 +27,13 @@ struct LocationSearch: View {
                         Array(displayBuildings.enumerated()), id: \.element.id) { index, building in
                             SearchItem(
                                 building: building,
-                                collegePrimary: collegePrimary,
                                 index: index,
                                 onSelect: {
                                     locationSearchFocus = false
                                     selectedBuilding = building
-                                },
-                                tintColor: .offWhite
+                                }
                             )
+                            .environmentObject(settingsManager)
                         }
                 }
             }
@@ -53,11 +52,10 @@ struct LocationSearch: View {
 }
 
 struct LocationSearchButton: View {
+    @EnvironmentObject var settingsManager: SettingsManager
     @FocusState.Binding var locationSearchFocus: Bool
     @Binding var isEventSearching: Bool
     @Binding var eventSearchText: String
-    let collegePrimary: Color
-    let collegeSecondary: Color
     var body: some View {
         Button {
             withAnimation(.easeInOut(duration: 0.4)) {
@@ -67,13 +65,11 @@ struct LocationSearchButton: View {
         } label: {
             HStack(spacing: 20) {
                 ZStack {
-                    collegePrimary
                     LocationSearchButtonLabel
                         .padding(.horizontal, 16)
                 }
                 .frame(height: 50)
-                .cornerRadius(24)
-                .foregroundColor(collegeSecondary)
+                .foregroundColor(settingsManager.accentColor)
             }
         }
     }
@@ -81,12 +77,13 @@ struct LocationSearchButton: View {
     private var LocationSearchButtonLabel: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
+                .font(.system(size: 16))
             TextField(
                 "",
                 text: $eventSearchText,
-                prompt: Text("Search for a location")
-                    .foregroundColor(.offWhite.opacity(0.8))
-                    .italic()
+                prompt: Text("Choose a location")
+                    .font(.system(size: 14))
+                    .foregroundColor(settingsManager.primaryColor.opacity(0.8))
             )
             .multilineTextAlignment(.leading)
             .focused($locationSearchFocus)

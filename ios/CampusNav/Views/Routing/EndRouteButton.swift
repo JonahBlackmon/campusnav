@@ -7,6 +7,7 @@
 import SwiftUI
 
 struct EndRouteButton: View {
+    @EnvironmentObject var settingsManager: SettingsManager
     var resetData: () -> Void
     var body: some View {
         VStack {
@@ -20,8 +21,8 @@ struct EndRouteButton: View {
                         .fontWeight(.bold)
                 }
                 .frame(maxWidth: .infinity)
-                .foregroundStyle(.burntOrange)
-                .background(.offWhite)
+                .foregroundStyle(settingsManager.accentColor)
+                .background(settingsManager.primaryColor)
                 .cornerRadius(12)
                 .padding(.top, 0)
             }

@@ -12,11 +12,8 @@ struct CustomTabBar: View {
     // [(Tab Name, System Icon)]
     var tabItems: [(String, String)]
     
-    var collegePrimary: Color
-    
-    var collegeSecondary: Color
-    
     @EnvironmentObject var navState: NavigationUIState
+    @EnvironmentObject var settingsManager: SettingsManager
     
     // Name: (toggle, animating)
     @State private var toggles: [String: (Bool, Bool)] = [:]
@@ -33,12 +30,12 @@ struct CustomTabBar: View {
         .frame(maxWidth: .infinity)
         .overlay(
             RoundedRectangle(cornerRadius: 5)
-                .fill(.offWhite.opacity(0.3))
+                .fill(settingsManager.textColor.opacity(0.3))
                 .frame(maxWidth: .infinity)
                 .frame(height: 2),
             alignment: .top
         )
-        .background(collegePrimary)
+        .background(settingsManager.primaryColor)
         .animation(.easeInOut(duration: 0.1), value: navState.currentView)
         .frame(height: 30)
         .frame(maxHeight: .infinity, alignment: .bottom)
@@ -50,7 +47,7 @@ struct CustomTabBar: View {
     private func tabButtonBackground(for tabName: String) -> some View {
         if navState.currentView == tabName {
             RoundedRectangle(cornerRadius: 20)
-                .fill(collegeSecondary.opacity(0.3))
+                .fill(settingsManager.accentColor.opacity(0.3))
                 .frame(width: 75, height: 40)
                 .transition(.horizontalGrow)
         }
@@ -87,7 +84,7 @@ struct CustomTabBar: View {
     private func tabButtonText(_ text: String) -> some View {
         Text(text)
             .font(.system(size: 10))
-            .foregroundStyle(.offWhite)
+            .foregroundStyle(settingsManager.textColor)
     }
 
     

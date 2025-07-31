@@ -10,21 +10,31 @@ struct EventsList: View {
     @EnvironmentObject var buildingVM: BuildingViewModel
     @EnvironmentObject var eventVM: EventViewModel
     @EnvironmentObject var navState: NavigationUIState
-    var collegePrimary: Color
+    @EnvironmentObject var settingsManager: SettingsManager
     var body: some View {
-        ScrollView {
-            VStack(spacing: 10) {
-                ForEach(
-                    Array(eventVM.activeEvents.enumerated()), id: \.element.id) { index, event in
-                        EventItem(event: event, collegePrimary: collegePrimary)
-                            .environmentObject(buildingVM)
-                            .environmentObject(eventVM)
-                            .environmentObject(navState)
+        if eventVM.activeEvents.count > 0 {
+            ScrollView {
+                VStack(spacing: 10) {
+                    ForEach(
+                        Array(eventVM.activeEvents.enumerated()), id: \.element.id) { index, event in
+                            EventItem(event: event)
+                                .environmentObject(buildingVM)
+                                .environmentObject(eventVM)
+                                .environmentObject(navState)
+                                .environmentObject(settingsManager)
+                        }
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+            .padding(.top, 100)
+        } else {
+            Text("Hmm no events seem to be found.. Try making one!")
+                .font(.system(size: 15))
+                .foregroundStyle(.charcoal)
+                .fontWeight(.bold)
+                .padding()
+                .frame(alignment: .center)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .padding(.top, 100)
     }
 }
 
@@ -32,8 +42,8 @@ struct EventItem: View {
     @EnvironmentObject var buildingVM: BuildingViewModel
     @EnvironmentObject var eventVM: EventViewModel
     @EnvironmentObject var navState: NavigationUIState
+    @EnvironmentObject var settingsManager: SettingsManager
     let event: Event
-    var collegePrimary: Color
     var building: Building? {
         return buildingVM.selectBuilding(abbr: event.abbr)
     }
@@ -61,7 +71,7 @@ struct EventItem: View {
                                 HStack {
                                     Text("\(event.club_name ?? "Meeting") @ \(event.abbr)")
                                 }
-                                .foregroundStyle(collegePrimary)
+                                .foregroundStyle(settingsManager.primaryColor)
                             }
                             Spacer()
                             if event.location_description != nil {
@@ -98,8 +108,6 @@ struct MyEventItem: View {
     @EnvironmentObject var firebaseManager: FirebaseManager
     @EnvironmentObject var settingsManager: SettingsManager
     let event: LocalEvent?
-    var collegePrimary: Color
-    var collegeSecondary: Color
     var index: Int
     var building: Building? {
         return buildingVM.selectBuilding(abbr: event?.abbr ?? "")
@@ -120,12 +128,12 @@ struct MyEventItem: View {
                         HStack {
                             VStack(alignment: .leading) {
                                 Text(event?.event_name ?? "")
-                                    .foregroundStyle(collegeSecondary)
+                                    .foregroundStyle(settingsManager.accentColor)
                                     .font(.system(size: 20))
                                 HStack {
                                     Text("\(event?.club_name ?? "Meeting") @ \(event?.abbr ?? "")")
                                 }
-                                .foregroundStyle(collegeSecondary)
+                                .foregroundStyle(settingsManager.accentColor)
                             }
                             Spacer()
                             if event?.location_description != nil {
@@ -134,13 +142,13 @@ struct MyEventItem: View {
                                 } label: {
                                     Image(systemName: "trash")
                                         .rotationEffect(Angle(degrees: showDesc ? 180 : 0))
-                                        .foregroundStyle(collegeSecondary)
+                                        .foregroundStyle(settingsManager.accentColor)
                                         .padding()
                                 }
                             }
                         }
                         Divider()
-                            .overlay(collegeSecondary)
+                            .overlay(settingsManager.accentColor)
                             .padding(.trailing)
                     }
                 }
@@ -155,11 +163,4 @@ struct MyEventItem: View {
             }
         }
     }
-}
-
-#Preview {
-    EventItem(event: Event(abbr: "GDC", location_description: "GDC 4th Floor", club_name: "ACM", event_name: "Weekly Meeting", event_times: ["Tuesday 6:00 PM", "Thursday 6:00 PM"], isRepeating: true), collegePrimary: .burntOrange)
-        .environmentObject(BuildingViewModel())
-        .environmentObject(EventViewModel())
-        .environmentObject(NavigationUIState())
 }

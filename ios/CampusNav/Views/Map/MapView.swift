@@ -15,6 +15,7 @@ struct MapView: View {
     @EnvironmentObject var buildingVM: BuildingViewModel
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var eventVM: EventViewModel
+    @EnvironmentObject var settingsManager: SettingsManager
     let starting_position: MapCameraPosition = .region(.init(center: .init(latitude: 30.2850, longitude: -97.7335), latitudinalMeters: 1300, longitudinalMeters: 1300))
     var body: some View {
         MapBoxMapView()
@@ -22,6 +23,7 @@ struct MapView: View {
             .environmentObject(navigationVM)
             .environmentObject(buildingVM)
             .environmentObject(eventVM)
+            .environmentObject(settingsManager)
     }
 }
 
@@ -64,14 +66,15 @@ struct MapBoxMapView: View {
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var buildingVM: BuildingViewModel
     @EnvironmentObject var eventVM: EventViewModel
+    @EnvironmentObject var settingsManager: SettingsManager
     var body: some View {
         MapReader { proxy in
             Map(viewport: $viewport) {
                 // General route styling
                 PolylineAnnotationGroup() {
                     PolylineAnnotation(lineCoordinates: navigationVM.currentCoordinates)
-                        .lineColor(.lightOrange)
-                        .lineBorderColor(.burntOrange)
+                        .lineColor(UIColor(settingsManager.lighterAccent))
+                        .lineBorderColor(UIColor(settingsManager.accentColor))
                         .lineWidth(10)
                         .lineBorderWidth(2)
                 }
@@ -143,7 +146,9 @@ struct MapBoxMapView: View {
                     SymbolLayer(id: "building-labels", source: "ut-buildings")
                         .textField(Exp(.get) { "Building_Abbr" })
                         .textColor(
-                            Exp(.match) {
+                            eventVM.eventBuildingAbbr.isEmpty
+                            ? Exp(.literal) { UIColor.darkGray }
+                            : Exp(.match) {
                                 Exp(.get) { "Building_Abbr" }
                                 eventVM.eventBuildingAbbr
                                 UIColor.offWhite
@@ -152,9 +157,11 @@ struct MapBoxMapView: View {
                         )
                         .textSize(7)
                         .textFont(["Open Sans Bold"])
-                        .textHaloColor(StyleColor(.burntOrange))
+                        .textHaloColor(UIColor(settingsManager.accentColor))
                         .textHaloWidth(
-                            Exp(.match) {
+                            eventVM.eventBuildingAbbr.isEmpty
+                            ? Exp(.literal) { 0.0 }
+                            : Exp(.match) {
                                 Exp(.get) { "Building_Abbr" }
                                 eventVM.eventBuildingAbbr
                                 1.0

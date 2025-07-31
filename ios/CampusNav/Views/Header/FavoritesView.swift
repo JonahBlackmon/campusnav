@@ -11,8 +11,6 @@ struct FavoritesView: View {
     @EnvironmentObject var buildingVM: BuildingViewModel
     @EnvironmentObject var navState: NavigationUIState
     @EnvironmentObject var headerVM: HeaderViewModel
-    var collegePrimary: Color
-    var collegeSecondary: Color
     var body: some View {
         ZStack {
             Color.black.opacity(0.8)
@@ -25,11 +23,11 @@ struct FavoritesView: View {
                     }
                 }
             ZStack {
-                collegePrimary
+                settingsManager.primaryColor
                 if !settingsManager.favorites.isEmpty {
                     ScrollView {
                         ForEach(Array(settingsManager.favorites.keys.enumerated()), id: \.element) { index, key in
-                            FavoritesItem(key: key, index: index, collegePrimary: collegePrimary, collegeSecondary: collegeSecondary)
+                            FavoritesItem(key: key, index: index)
                                 .environmentObject(settingsManager)
                                 .environmentObject(buildingVM)
                                 .environmentObject(navState)
@@ -56,8 +54,6 @@ struct FavoritesView: View {
 struct FavoritesItem: View {
     let key: String
     let index: Int
-    let collegePrimary: Color
-    let collegeSecondary: Color
     @State var show: Bool = false
     @EnvironmentObject var headerVM: HeaderViewModel
     @EnvironmentObject var navState: NavigationUIState
@@ -83,14 +79,14 @@ struct FavoritesItem: View {
                     Text(key)
                         .font(.system(size: 10))
                     Divider()
-                        .overlay(.offWhite)
+                        .overlay(settingsManager.textColor)
                 }
                 Spacer()
                 FavoritesButton(building: settingsManager.favorites[key] ?? Building(abbr: key, name: "", photoURL: ""))
                     .environmentObject(settingsManager)
                     .font(.system(size: 18))
             }
-            .foregroundStyle(.offWhite)
+            .foregroundStyle(settingsManager.textColor)
         }
         .foregroundStyle(.black.opacity(0.8))
         .padding()
@@ -101,55 +97,4 @@ struct FavoritesItem: View {
             show = true
         }
     }
-}
-
-struct FavoritesIconButton: View {
-    @EnvironmentObject var headerVM: HeaderViewModel
-    @EnvironmentObject var navState: NavigationUIState
-    let collegePrimary: Color
-    let collegeSecondary: Color
-    @FocusState.Binding var searchFocused: Bool
-    var body: some View {
-        Button {
-            withAnimation(.easeInOut(duration: 0.3)) {
-                navState.isSearching = false
-                headerVM.showSettings = false
-                headerVM.animateSettings = false
-                searchFocused = false
-                headerVM.animateFavorites.toggle()
-                headerVM.showFavorites.toggle()
-            }
-        } label: {
-            ZStack {
-                collegePrimary
-                Image(systemName: headerVM.animateFavorites ? "star.fill" : "star")
-                    .foregroundStyle(collegeSecondary)
-                    .font(.system(size: 20))
-            }
-            .frame(width: 50, height: 50)
-            .cornerRadius(24)
-            .keyframeAnimator(initialValue: FavoritesProperties(), trigger: headerVM.animateFavorites) {
-                content, value in
-                content
-                    .scaleEffect(value.verticalStretch)
-                    .rotationEffect(Angle(degrees: value.rotation))
-            } keyframes: { _ in
-                KeyframeTrack(\.verticalStretch) {
-                    SpringKeyframe(1.15, duration: animationDuration * 0.25)
-                    CubicKeyframe(1, duration: animationDuration * 0.25)
-                }
-                KeyframeTrack(\.rotation) {
-                    CubicKeyframe(30, duration: animationDuration * 0.15)
-                    CubicKeyframe(-30, duration: animationDuration * 0.15)
-                    CubicKeyframe(0, duration: animationDuration * 0.15)
-                }
-            }
-        }
-        .sensoryFeedback(.impact(flexibility: .rigid, intensity: 1.0), trigger: headerVM.animateFavorites)
-    }
-}
-
-struct FavoritesProperties {
-    var rotation: Double = 0.0
-    var verticalStretch: Double = 1.0
 }

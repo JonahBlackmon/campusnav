@@ -21,13 +21,6 @@ struct ContentView: View {
     
     let tabBar: [(String, String)] = [("Map", "map"), ("Events", "events")]
     
-    var collegePrimary: Color {
-       return settingsManager.collegePrimary
-    }
-    var collegeSecondary: Color {
-       return settingsManager.collegeSecondary
-    }
-    
     var body: some View {
         ZStack(alignment: .top) {
             mainContentView
@@ -83,8 +76,9 @@ struct ContentView: View {
     
     private var cardView: some View {
         ZStack {
-            collegePrimary.edgesIgnoringSafeArea(.all)
+            settingsManager.primaryColor.edgesIgnoringSafeArea(.all)
             NavigationCard()
+                .environmentObject(settingsManager)
                 .environmentObject(navState)
                 .environmentObject(navigationVM)
                 .environmentObject(buildingVM)
@@ -96,6 +90,7 @@ struct ContentView: View {
         ZStack {
             if navState.showArrival {
                 ArrivalScreen()
+                    .environmentObject(settingsManager)
                     .environmentObject(navState)
                     .environmentObject(buildingVM)
             }
@@ -106,9 +101,11 @@ struct ContentView: View {
         ZStack {
             if navState.isNavigating {
                 RoutingTop()
+                    .environmentObject(settingsManager)
                     .environmentObject(navigationVM)
                     .transition(.move(edge: .top))
                 RoutingBottom(resetData: navCoord.resetData)
+                    .environmentObject(settingsManager)
                     .environmentObject(navigationVM)
                     .transition(.move(edge: .bottom))
             }
@@ -130,10 +127,11 @@ struct ContentView: View {
                 .environmentObject(navigationVM)
                 .environmentObject(navState)
                 .environmentObject(eventVM)
+                .environmentObject(settingsManager)
                 .ignoresSafeArea()
                 .preferredColorScheme(.light)
         case "Events":
-            EventView(collegePrimary: collegePrimary, collegeSecondary: collegeSecondary)
+            EventView()
                 .environmentObject(buildingVM)
                 .environmentObject(eventVM)
                 .environmentObject(navState)
@@ -141,6 +139,7 @@ struct ContentView: View {
                 .environmentObject(settingsManager)
         default:
             MapView()
+                .environmentObject(settingsManager)
                 .environmentObject(buildingVM)
                 .environmentObject(navigationVM)
                 .environmentObject(navState)
@@ -153,12 +152,12 @@ struct ContentView: View {
     private var mainContentView: some View {
         ZStack() {
             contentArea
-            HeaderView(collegePrimary: collegePrimary, collegeSecondary: collegeSecondary)
+            HeaderView()
                 .environmentObject(headerVM)
                 .environmentObject(navState)
                 .environmentObject(buildingVM)
                 .environmentObject(settingsManager)
-            CustomTabBar(tabItems: tabBar, collegePrimary: settingsManager.collegePrimary, collegeSecondary: settingsManager.collegeSecondary)
+            CustomTabBar(tabItems: tabBar)
                 .environmentObject(navState)
         }
     }

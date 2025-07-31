@@ -8,14 +8,16 @@
 import SwiftUI
 
 struct Keys {
-    static let CollegePrimary = "CollegePrimary"
-    static let CollegeSecondary = "CollegeSecondary"
+    static let PrimaryColor = "PrimaryColor"
+    static let AccentColor = "AccentColor"
+    static let TextColor = "TextColor"
+    static let LighterAccent = "LighterAccent"
     static let Favorites = "Favorites"
     static let Events = "Events"
 }
 
 let Colors: [String: Color] = ["burntOrange" : Color.burntOrange, "offWhite" : Color.offWhite,
-                                      "tcuPurple" : Color.tcuPurple]
+                               "tcuPurple" : Color.tcuPurple, "charcoal" : Color.charcoal, "lightOrange" : Color.lightOrange]
 
 func colorFromString(colorString: String) -> Color {
     return Colors[colorString]!
@@ -26,12 +28,19 @@ func colorFromString(colorString: String) -> Color {
 class SettingsManager: ObservableObject {
     let defaults = UserDefaults.standard
     
-    @AppStorage(Keys.CollegePrimary) var collegePrimaryString: String = "burntOrange"
-    @AppStorage(Keys.CollegeSecondary) var collegeSecondaryString: String = "offWhite"
+    @AppStorage(Keys.PrimaryColor) var primaryColorString: String = "offWhite"
+    @AppStorage(Keys.AccentColor) var accentColorString: String = "burntOrange"
+    @AppStorage(Keys.TextColor) var textColorString: String = "charcoal"
+    @AppStorage(Keys.LighterAccent) var lighterAccentString: String = "lightOrange"
     
     @Published var favorites: [String : Building] = [:]
     
     @Published var events: [String : LocalEvent] = [:]
+    
+//    @Published var primaryColor: Color = .offWhite
+//    @Published var accentColor: Color = .burntOrange
+//    @Published var textColor: Color = .charcoal
+//    @Published var lighterAccent: Color = .lightOrange
     
     init() {
         do {
@@ -56,16 +65,28 @@ class SettingsManager: ObservableObject {
         return Array(favorites.values)
     }
     
-    var collegePrimary: Color {
-        return colorFromString(colorString: collegePrimaryString)
+    var primaryColor: Color {
+        return colorFromString(colorString: primaryColorString)
     }
-    var collegeSecondary: Color {
-        return colorFromString(colorString: collegeSecondaryString)
+    var accentColor: Color {
+        return colorFromString(colorString: accentColorString)
     }
     
-    func updateCollegeColors(collegePrimary: String, collegeSecondary: String) {
-        defaults.set(collegePrimary, forKey: Keys.CollegePrimary)
-        defaults.set(collegeSecondary, forKey: Keys.CollegeSecondary)
+    var textColor: Color {
+        return colorFromString(colorString: textColorString)
+    }
+    var lighterAccent: Color {
+        return colorFromString(colorString: lighterAccentString)
+    }
+    
+    func updateThemeColors(primaryColor: String, textColor: String) {
+        defaults.set(primaryColor, forKey: Keys.PrimaryColor)
+        defaults.set(textColor, forKey: Keys.TextColor)
+    }
+    
+    func updateCollegeColors(accentColor: String, lighterAccentColor: String) {
+        defaults.set(lighterAccentColor, forKey: Keys.PrimaryColor)
+        defaults.set(accentColor, forKey: Keys.AccentColor)
     }
     
     func writeEvent(_ event: LocalEvent, ref: String) {

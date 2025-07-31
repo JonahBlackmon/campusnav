@@ -16,6 +16,7 @@ class EventViewModel: ObservableObject {
     @Published var activeEvents: [Event] = []
     @Published var eventBuildings: [Building?] = []
     @Published var eventBuildingAbbr: [String] = []
+    @Published var showDescription: Bool = false
     
     @MainActor
     func loadCurrentEvents(firebaseManager: FirebaseManager, buildingVM: BuildingViewModel) async {
@@ -66,6 +67,7 @@ class EventViewModel: ObservableObject {
             animateEvent = false
             showMyEvents = false
             animateMyEvents = false
+            showDescription = false
         }
     }
 }

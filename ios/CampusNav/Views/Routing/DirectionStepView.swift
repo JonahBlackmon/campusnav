@@ -7,6 +7,7 @@
 import SwiftUI
 
 struct DirectionStepView: View {
+    @EnvironmentObject var settingsManager: SettingsManager
     var directionIcon: String
     var directionDescription: String
     var distance: String
@@ -23,10 +24,10 @@ struct DirectionStepView: View {
             .font(.system(size: 35))
         }
         .padding(.leading, 50)
-        .foregroundStyle(.offWhite)
+        .foregroundStyle(settingsManager.textColor)
         .frame(maxWidth: .infinity, alignment: .leading)
         Divider()
-            .overlay(.offWhite)
+            .overlay(settingsManager.textColor)
             .padding(.leading)
             .padding(.trailing)
     }
