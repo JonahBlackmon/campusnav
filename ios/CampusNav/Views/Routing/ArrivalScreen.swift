@@ -50,7 +50,7 @@ struct ArrivalScreenBanner: View {
         HStack(spacing: 5) {
             BuildingImageView()
                 .environmentObject(buildingVM)
-                .shadow(color: .black.opacity(0.3), radius: 20)
+                .shadow(color: settingsManager.textColor.opacity(0.3), radius: 20)
                 .frame(width: 30, height: 30)
                 .cornerRadius(4)
             VStack(alignment: .center) {

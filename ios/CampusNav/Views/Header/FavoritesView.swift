@@ -77,6 +77,7 @@ struct FavoritesItem: View {
                     Text(name)
                         .font(.system(size: 15))
                     Text(key)
+                        .foregroundStyle(settingsManager.accentColor)
                         .font(.system(size: 10))
                     Divider()
                         .overlay(settingsManager.textColor)
@@ -85,10 +86,11 @@ struct FavoritesItem: View {
                 FavoritesButton(building: settingsManager.favorites[key] ?? Building(abbr: key, name: "", photoURL: ""))
                     .environmentObject(settingsManager)
                     .font(.system(size: 18))
+                    .foregroundStyle(settingsManager.accentColor)
             }
             .foregroundStyle(settingsManager.textColor)
         }
-        .foregroundStyle(.black.opacity(0.8))
+        .foregroundStyle(settingsManager.textColor.opacity(0.8))
         .padding()
         .opacity(show ? 1 : 0)
         .offset(y: show ? 0 : 20)

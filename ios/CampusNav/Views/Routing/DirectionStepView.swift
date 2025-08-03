@@ -16,6 +16,7 @@ struct DirectionStepView: View {
             Image(systemName: directionIcon)
                 .font(.system(size: 60))
                 .fontWeight(.bold)
+                .foregroundStyle(settingsManager.accentColor)
             VStack(alignment: .leading) {
                 Text(distance)
                     .fontWeight(.bold)

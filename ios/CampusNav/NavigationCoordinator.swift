@@ -17,8 +17,6 @@ class NavigationCoordinator: ObservableObject {
     
     @Published var headerVM: HeaderViewModel
     
-    @Published var settingsManager: SettingsManager
-    
     @Published var firebaseManager: FirebaseManager
     
     @Published var eventVM: EventViewModel
@@ -28,7 +26,6 @@ class NavigationCoordinator: ObservableObject {
         self.buildingVM = BuildingViewModel()
         self.navState = NavigationUIState()
         self.headerVM = HeaderViewModel()
-        self.settingsManager = SettingsManager()
         self.firebaseManager = FirebaseManager()
         self.eventVM = EventViewModel()
     }
@@ -46,7 +43,7 @@ class NavigationCoordinator: ObservableObject {
     
     // Triggers update for navigation cards when viewing
     func updateCard() {
-        if navigationVM.currentLocation?.longitude != nil && navigationVM.currentLocation?.latitude != nil {
+        if navigationVM.currentLocation?.longitude != nil && navigationVM.currentLocation?.latitude != nil && buildingVM.abbr() != "" {
             let (_, _, newDistance) = find_route(lat: navigationVM.currentLocation!.latitude, lng: navigationVM.currentLocation!.longitude, dest_abbr: buildingVM.abbr())
             navigationVM.distance = newDistance
             navState.showNavigationCard = true
@@ -75,9 +72,11 @@ class NavigationCoordinator: ObservableObject {
                     }
                     // We are at the destination
                     (navigationVM.currentCoordinates, navigationVM.currentNodes, navigationVM.distance) = find_route(lat: cL.latitude, lng: cL.longitude, dest_abbr: buildingVM.abbr())
+                    navigationVM.directions = navigationVM.getDirections(destAbbr: buildingVM.abbr())
                 } else if distance_to_path(pos: cL, start: start, end: end) > 10 {
                     // Strayed to far from path, need to re route
                     (navigationVM.currentCoordinates, navigationVM.currentNodes, navigationVM.distance) = find_route(lat: cL.latitude, lng: cL.longitude, dest_abbr: buildingVM.abbr())
+                    navigationVM.directions = navigationVM.getDirections(destAbbr: buildingVM.abbr())
                 }
             }
         }

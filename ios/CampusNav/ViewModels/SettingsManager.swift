@@ -14,10 +14,11 @@ struct Keys {
     static let LighterAccent = "LighterAccent"
     static let Favorites = "Favorites"
     static let Events = "Events"
+    static let DarkMode = "DarkMode"
 }
 
 let Colors: [String: Color] = ["burntOrange" : Color.burntOrange, "offWhite" : Color.offWhite,
-                               "tcuPurple" : Color.tcuPurple, "charcoal" : Color.charcoal, "lightOrange" : Color.lightOrange]
+                               "tcuPurple" : Color.tcuPurple, "charcoal" : Color.charcoal, "lightOrange" : Color.lightOrange, "softBlack" : Color.softBlack]
 
 func colorFromString(colorString: String) -> Color {
     return Colors[colorString]!
@@ -28,37 +29,43 @@ func colorFromString(colorString: String) -> Color {
 class SettingsManager: ObservableObject {
     let defaults = UserDefaults.standard
     
-    @AppStorage(Keys.PrimaryColor) var primaryColorString: String = "offWhite"
-    @AppStorage(Keys.AccentColor) var accentColorString: String = "burntOrange"
-    @AppStorage(Keys.TextColor) var textColorString: String = "charcoal"
-    @AppStorage(Keys.LighterAccent) var lighterAccentString: String = "lightOrange"
+    @Published var primaryColorString: String = "offWhite"
+    @Published var accentColorString: String = "burntOrange"
+    @Published var textColorString: String = "softBlack"
+    @Published  var lighterAccentString: String = "lightOrange"
+    
+    @Published var darkMode: Bool
     
     @Published var favorites: [String : Building] = [:]
     
     @Published var events: [String : LocalEvent] = [:]
     
-//    @Published var primaryColor: Color = .offWhite
-//    @Published var accentColor: Color = .burntOrange
-//    @Published var textColor: Color = .charcoal
-//    @Published var lighterAccent: Color = .lightOrange
-    
     init() {
         do {
-            if var favoritesData = self.defaults.object(forKey: Keys.Favorites) as? Data {
+            if let favoritesData = self.defaults.object(forKey: Keys.Favorites) as? Data {
                 do {
                     favorites = try JSONDecoder().decode([String : Building].self, from: favoritesData)
                 } catch {
                     print("Error loading favorites: \(error)")
                 }
             }
-            if var eventsData = self.defaults.object(forKey: Keys.Events) as? Data {
+            if let eventsData = self.defaults.object(forKey: Keys.Events) as? Data {
                 do {
                     events = try JSONDecoder().decode([String : LocalEvent].self, from: eventsData)
                 } catch {
                     print("Error loading events: \(error)")
                 }
             }
+            self.darkMode = defaults.object(forKey: Keys.DarkMode) != nil
+                ? defaults.bool(forKey: Keys.DarkMode)
+                : false
+            setThemeColors()
         }
+    }
+    
+    func setThemeColors() {
+        primaryColorString = darkMode ? "softBlack" : "offWhite"
+        textColorString = darkMode ? "offWhite" : "softBlack"
     }
     
     func favoritesList() -> [Building] {
@@ -77,6 +84,11 @@ class SettingsManager: ObservableObject {
     }
     var lighterAccent: Color {
         return colorFromString(colorString: lighterAccentString)
+    }
+    
+    func toggleDarkMode() {
+        defaults.set(darkMode, forKey: Keys.DarkMode)
+        setThemeColors()
     }
     
     func updateThemeColors(primaryColor: String, textColor: String) {

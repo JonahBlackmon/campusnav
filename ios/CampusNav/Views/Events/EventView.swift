@@ -16,17 +16,16 @@ struct EventView: View {
         ZStack {
             settingsManager.primaryColor
                 .ignoresSafeArea()
-            EventsList()
-                .environmentObject(buildingVM)
-                .environmentObject(eventVM)
-                .environmentObject(navState)
-                .environmentObject(settingsManager)
-            if eventVM.showCreateEvent {
-                CreateEventView()
-                    .environmentObject(eventVM)
+            VStack {
+                HeaderText(text: "Events")
+                    .environmentObject(settingsManager)
+                EventsList()
                     .environmentObject(buildingVM)
+                    .environmentObject(eventVM)
+                    .environmentObject(navState)
                     .environmentObject(settingsManager)
             }
+            .frame(maxHeight: .infinity, alignment: .top)
             if eventVM.showMyEvents {
                 MyEventsView()
                     .environmentObject(buildingVM)
@@ -46,7 +45,7 @@ struct EventView: View {
                 })
                 .environmentObject(settingsManager)
                 Spacer()
-                GenericIcon(animate: $eventVM.animateEvent, navStateVar: $navState.events, closedIcon: "plus", openIcon: "minus", offset: 200, size: 20, onSelect: {
+                GenericIcon(animate: $eventVM.animateEvent, navStateVar: $navState.events, closedIcon: "plus", openIcon: "plus", offset: 200, size: 20, onSelect: {
                     withAnimation(.none) {
                         eventVM.animateEvent.toggle()
                     }
@@ -61,6 +60,29 @@ struct EventView: View {
             }
             .frame(maxHeight: .infinity, alignment: .top)
         }
+        .sheet(isPresented: $eventVM.showCreateEvent) {
+            CreateEventView()
+                .environmentObject(eventVM)
+                .environmentObject(buildingVM)
+                .environmentObject(settingsManager)
+        }
+    }
+}
+
+struct HeaderText: View {
+    @EnvironmentObject var settingsManager: SettingsManager
+    var text: String
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(text)
+                .font(.system(size: 30))
+                .foregroundStyle(settingsManager.textColor)
+                .fontWeight(.bold)
+            Divider()
+                .overlay(settingsManager.textColor)
+        }
+        .padding()
+        .padding(.top, 75)
     }
 }
 

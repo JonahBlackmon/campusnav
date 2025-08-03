@@ -37,11 +37,11 @@ struct HeaderView: View {
                     .environmentObject(headerVM)
                     .environmentObject(navState)
                     .environmentObject(settingsManager)
-                    .offset(y: navState.isNavigating || navState.events ? -200 : 0)
+                    .offset(y: navState.isNavigating || navState.events || navState.settings ? -200 : 0)
                 HStack {
                     GenericIcon(animate: $headerVM.animateSettings, navStateVar: Binding<Bool>(
                         get: {
-                            !navState.isSearching && !navState.isNavigating && !navState.events
+                            !navState.isSearching && !navState.isNavigating && !navState.events && !navState.settings
                         },
                         set: { _ in }
                     ), closedIcon: "gearshape", openIcon: "gearshape.fill", offset: -200, size: 22, onSelect: {
@@ -58,7 +58,7 @@ struct HeaderView: View {
                     Spacer()
                     GenericIcon(animate: $headerVM.animateFavorites, navStateVar: Binding<Bool>(
                         get: {
-                            !navState.isSearching && !navState.isNavigating && !navState.events
+                            !navState.isSearching && !navState.isNavigating && !navState.events && !navState.settings
                         },
                         set: { _ in }
                     ), closedIcon: "star", openIcon: "star.fill", offset: 200, size: 20, onSelect: {
@@ -77,7 +77,7 @@ struct HeaderView: View {
             .frame(maxHeight: .infinity, alignment: .top)
             .padding(.leading)
             .padding(.trailing)
-            .shadow(color: .black.opacity(0.5), radius: 5)
+            .shadow(color: settingsManager.textColor.opacity(0.3), radius: 3)
         }
     }
 }

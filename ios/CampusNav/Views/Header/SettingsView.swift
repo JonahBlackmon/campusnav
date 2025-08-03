@@ -38,3 +38,52 @@ struct SettingsView: View {
         .padding(.trailing, 10)
     }
 }
+
+
+struct SettingsView2: View {
+    @EnvironmentObject var settingsManager: SettingsManager
+    var body: some View {
+        ZStack {
+            settingsManager.primaryColor
+                .ignoresSafeArea()
+            VStack(alignment: .leading) {
+                Text("Settings")
+                    .font(.system(size: 30))
+                    .foregroundStyle(settingsManager.textColor)
+                    .fontWeight(.bold)
+                    .padding()
+                SettingsItem(toggleValue: $settingsManager.darkMode, action: settingsManager.toggleDarkMode, icon: settingsManager.darkMode ? "moon.fill" : "cloud.sun.fill", text: "Dark Mode")
+                Spacer()
+            }
+        }
+    }
+}
+
+struct SettingsItem: View {
+    @EnvironmentObject var settingsManager: SettingsManager
+    @Binding var toggleValue: Bool
+    var action: () -> Void
+    var icon: String
+    var text: String
+    var body: some View {
+        VStack {
+            HStack {
+                Toggle(isOn: $toggleValue) {
+                    HStack {
+                        Image(systemName: icon)
+                            .foregroundStyle(settingsManager.accentColor)
+                        Text(text)
+                            .foregroundStyle(settingsManager.textColor)
+                    }
+                }
+                .tint(settingsManager.accentColor)
+            }
+            Divider()
+                .overlay(settingsManager.textColor)
+        }
+        .padding()
+        .onChange(of: toggleValue) {
+            action()
+        }
+    }
+}

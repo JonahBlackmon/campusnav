@@ -14,6 +14,7 @@ struct Event: Identifiable, Codable {
     var event_name: String? // If this is an event what's the name? i.e. "General Meeting" or "Calc Study Session"
     var event_times: [String] // When does this event occur?
     var isRepeating: Bool // Is this a repeating event?
+    var tags: [String] // What type of event is this?
 }
 
 extension Event {
@@ -25,7 +26,8 @@ extension Event {
             club_name: self.club_name,
             event_name: self.event_name,
             event_times: self.event_times,
-            isRepeating: self.isRepeating
+            isRepeating: self.isRepeating,
+            tags: self.tags
         )
     }
 }
@@ -39,6 +41,7 @@ struct LocalEvent: Identifiable, Codable {
     var event_name: String?
     var event_times: [String]
     var isRepeating: Bool
+    var tags: [String]
 }
 
 extension LocalEvent {
@@ -50,7 +53,8 @@ extension LocalEvent {
             club_name: self.club_name,
             event_name: self.event_name,
             event_times: self.event_times,
-            isRepeating: self.isRepeating
+            isRepeating: self.isRepeating,
+            tags: self.tags
         )
     }
 }

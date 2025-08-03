@@ -19,7 +19,7 @@ struct ContentView: View {
     @EnvironmentObject var firebaseManager: FirebaseManager
     @EnvironmentObject var eventVM: EventViewModel
     
-    let tabBar: [(String, String)] = [("Map", "map"), ("Events", "events")]
+    let tabBar: [(String, String)] = [("Map", "map"), ("Events", "calendar"), ("Settings", "gearshape")]
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -33,7 +33,7 @@ struct ContentView: View {
         }
         .onChange(of: buildingVM.selectedBuilding) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                if navState.showNavigationCard {
+                if navState.showNavigationCard && buildingVM.selectedBuilding?.abbr != "" {
                     navCoord.updateCard()
                 }
             }
@@ -51,12 +51,17 @@ struct ContentView: View {
         }
         .onChange(of: navState.currentView) {
             let events: Bool = navState.currentView == "Events"
+            let settings: Bool = navState.currentView == "Settings"
             withAnimation(.easeInOut(duration: 0.3)) {
                 navState.events = events
+                navState.settings = settings
             }
             if !events {
                 eventVM.ExitEvent()
             } else {
+                Task {
+                    await eventVM.loadCurrentEvents(firebaseManager: firebaseManager, buildingVM: buildingVM)
+                }
                 headerVM.ExitHeader(navState: navState)
             }
         }
@@ -136,6 +141,9 @@ struct ContentView: View {
                 .environmentObject(eventVM)
                 .environmentObject(navState)
                 .environmentObject(firebaseManager)
+                .environmentObject(settingsManager)
+        case "Settings":
+            SettingsView2()
                 .environmentObject(settingsManager)
         default:
             MapView()

@@ -40,8 +40,9 @@ struct InputFieldWithDescription: View {
                 text: $textField,
                 prompt: Text(placeHolderText)
                     .font(.system(size: 14))
-                    .foregroundColor(settingsManager.primaryColor.opacity(0.8))
+                    .foregroundColor(settingsManager.accentColor.opacity(0.8))
             )
+            .foregroundColor(settingsManager.textColor)
             .padding(.leading)
             AddDescriptionButton(description: $description, showDescription: $showDescription, descriptionFocus: $descriptionFocus)
                 .environmentObject(settingsManager)
@@ -72,7 +73,7 @@ struct AddDescriptionButton: View {
                 .cornerRadius(8)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.charcoal.opacity(0.3), lineWidth: 1)
+                        .stroke(settingsManager.accentColor.opacity(0.3), lineWidth: 1)
                 )
         }
     }
@@ -84,7 +85,7 @@ struct DescriptionView: View {
     @Binding var showDescription: Bool
     @FocusState.Binding var descriptionFocus: Bool
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             Color.black.opacity(0.0001)
                 .onTapGesture {
                     withAnimation(.easeInOut(duration: 0.3)) {
@@ -114,5 +115,6 @@ struct DescriptionView: View {
             .background(.ultraThinMaterial)
             .cornerRadius(12)
         }
+        .padding(.top, 100)
     }
 }

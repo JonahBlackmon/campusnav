@@ -21,8 +21,8 @@ struct CreateEventView: View {
     @State var isEventSearching: Bool = false
     @State var eventSearchText: String = ""
     @State var date: Date = Date()
-    @State var startTime: Date = Date()
-    @State var endTime: Date = Date()
+    @State var time: Date = Date()
+    @State var duration: Date = Calendar.current.date(from: DateComponents(hour: 0, minute: 0)) ?? Date()
     
     // Focus vars
     @FocusState var clubFocus: Bool
@@ -31,73 +31,64 @@ struct CreateEventView: View {
     @FocusState var locationSearchFocus: Bool
     @FocusState var descriptionFocus: Bool
     
-    
+    @State var selectedTags: Set<EventTag> = []
     
     var body: some View {
-        Color.black.opacity(0.8)
-            .ignoresSafeArea()
-            .transition(.opacity)
-            .onTapGesture {
-                withAnimation(.none) {
-                    eventVM.animateEvent = false
-                }
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    eventVM.showCreateEvent = false
-                    eventVM.animateMyEvents = false
-                    eventVM.showMyEvents = false
-                    descriptionFocus = false
-                }
-            }
         ZStack {
             settingsManager.primaryColor
-                .onTapGesture {
-                    clubFocus = false
-                    eventFocus = false
-                    descriptionFocus = false
-                }
             VStack(alignment: .leading) {
                 Text("Create Event")
                     .font(.system(size: 20))
                     .fontWeight(.bold)
-                    .foregroundStyle(settingsManager.accentColor)
+                    .foregroundStyle(settingsManager.textColor)
                     .padding()
                 ScrollView {
                     VStack(alignment: .leading) {
                         Text("Event Name")
                             .font(.system(size: 18))
-                            .foregroundStyle(settingsManager.accentColor)
+                            .foregroundStyle(settingsManager.textColor.opacity(0.6))
                             .padding(.leading)
                             .frame(alignment: .leading)
                         InputFieldWithDescription(textField: $eventName, placeHolderText: "Enter event name", description: $description, showDescription: $eventVM.showDescription, descriptionFocus: $descriptionFocus)
                             .environmentObject(settingsManager)
                             .focused($eventFocus)
-                            .padding()
-                        HStack {
+                            .padding(.horizontal)
+                        HStack(alignment: .top, spacing: 20) {
                             VStack(alignment: .leading) {
                                 Text("Date")
                                     .font(.system(size: 18))
-                                    .foregroundStyle(settingsManager.accentColor)
+                                    .foregroundStyle(settingsManager.textColor.opacity(0.6))
                                 CompactDateSelector(date: $date)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                             }
-                            Spacer()
                             VStack(alignment: .leading) {
-                                Text("Start Time")
+                                Text("Time")
                                     .font(.system(size: 18))
-                                    .foregroundStyle(settingsManager.accentColor)
-                                TimeSelector(time: $startTime)
+                                    .foregroundStyle(settingsManager.textColor.opacity(0.6))
+                                TimeSelector(time: $time)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                             }
-                            Spacer()
                             VStack(alignment: .leading) {
-                                Text("End Time")
+                                Text("Duration")
                                     .font(.system(size: 18))
-                                    .foregroundStyle(settingsManager.accentColor)
-                                TimeSelector(time: $endTime)
+                                    .foregroundStyle(settingsManager.textColor.opacity(0.6))
+                                DurationSelector(time: $duration)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .offset(x: -35)
                             }
                         }
                         .padding()
+                        Text("Tags")
+                            .font(.system(size: 18))
+                            .foregroundStyle(settingsManager.textColor.opacity(0.6))
+                            .padding(.leading)
+                            .frame(alignment: .leading)
+                        AddTags(selectedTags: $selectedTags)
+                            .environmentObject(settingsManager)
+                        
                         Text("Location")
                             .font(.system(size: 18))
-                            .foregroundStyle(settingsManager.accentColor)
+                            .foregroundStyle(settingsManager.textColor.opacity(0.6))
                             .padding(.leading)
                             .frame(alignment: .leading)
                         if selectedBuilding == nil {
@@ -105,7 +96,7 @@ struct CreateEventView: View {
                                 .padding(4)
                                 .background(settingsManager.accentColor.opacity(0.1))
                                 .cornerRadius(8)
-                                .padding()
+                                .padding(.horizontal)
                             if isEventSearching {
                                 LocationSearch(eventSearchText: $eventSearchText, locationSearchFocus: $locationSearchFocus, selectedBuilding: $selectedBuilding)
                                     .environmentObject(settingsManager)
@@ -114,51 +105,31 @@ struct CreateEventView: View {
                         } else {
                             // We have a building chosen
                             HStack {
-                                Text("Location: \(selectedBuilding?.name ?? "")")
+                                Text("\(selectedBuilding?.name ?? "")")
                                     .frame(alignment: .leading)
-                                    .fontWeight(.bold)
                                     .font(.system(size: 15))
                                     .foregroundStyle(settingsManager.accentColor)
                                 Spacer()
                             }
                             .padding()
                         }
-//                        InputField(textField: $clubName, placeHolderText: "Club Name (Optional)", collegeSecondary: collegeSecondary)
-//                            .focused($clubFocus)
-//                            .padding(.leading)
-//                            .padding(.trailing)
-//                        InputField(textField: $description, placeHolderText: "Location Description (Optional)", collegeSecondary: collegeSecondary)
-//                            .focused($descFocus)
-//                            .padding(.leading)
-//                            .padding(.trailing)
-//                        Toggle(isOn: $isRepeating) {
-//                            Text("Is this event repeating?")
-//                                .fontWeight(.bold)
-//                                .font(.system(size: 15))
-//                                .foregroundStyle(collegeSecondary)
-//                        }
-//                        .tint(collegeSecondary)
-//                        .padding()
-//                        DateTimeSelector(collegeSecondary: collegeSecondary, date: $date, time: $time)
                     }
                 }
-                SaveEventButton(building: selectedBuilding, description: description, clubName: clubName, eventName: eventName, isRepeating: isRepeating, days: $date, time: $startTime)
+                SaveEventButton(building: selectedBuilding, description: description, clubName: clubName, eventName: eventName, isRepeating: isRepeating, days: $date, time: $time, tags: selectedTags)
                     .environmentObject(eventVM)
                     .environmentObject(firebaseManager)
                     .environmentObject(settingsManager)
+                    .environmentObject(buildingVM)
                     .padding()
             }
+            .padding(.vertical)
             if eventVM.showDescription {
                 DescriptionView(description: $description, showDescription: $eventVM.showDescription, descriptionFocus: $descriptionFocus)
             }
+            Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .cornerRadius(12)
-        .shadow(radius: 5)
-        .padding(.top, 85)
-        .padding(.bottom, 75)
-        .padding(.leading, 10)
-        .padding(.trailing, 10)
+        .ignoresSafeArea()
         .onChange(of: locationSearchFocus) {
             if locationSearchFocus {
                 isEventSearching = true
@@ -171,6 +142,7 @@ struct SaveEventButton: View {
     @EnvironmentObject var settingsManager: SettingsManager
     @EnvironmentObject var eventVM: EventViewModel
     @EnvironmentObject var firebaseManager: FirebaseManager
+    @EnvironmentObject var buildingVM: BuildingViewModel
     let building: Building?
     let description: String?
     let clubName: String?
@@ -178,6 +150,8 @@ struct SaveEventButton: View {
     let isRepeating: Bool
     @Binding var days: Date
     @Binding var time: Date
+    let tags: Set<EventTag>
+    var tagStrings: [String] { tags.map { $0.rawValue } }
     @State var showEventError: Bool = false
     @State var showDaysError: Bool = false
     @State var showBuildingError: Bool = false
@@ -188,7 +162,10 @@ struct SaveEventButton: View {
             } else if eventName == "" {
                 showEventError = true
             } else {
-                firebaseManager.publishEvent(abbr: building?.abbr ?? "", locationDescription: description, clubName: clubName, eventName: eventName, eventTimes: combinedDateTimeFormatted(day: days, time: time), isRepeating: isRepeating, settingsManager: settingsManager)
+                firebaseManager.publishEvent(abbr: building?.abbr ?? "", locationDescription: description, clubName: clubName, eventName: eventName, eventTimes: combinedDateTimeFormatted(day: days, time: time), isRepeating: isRepeating, tags: tagStrings, settingsManager: settingsManager)
+                Task {
+                    await eventVM.loadCurrentEvents(firebaseManager: firebaseManager, buildingVM: buildingVM)
+                }
                 eventVM.ExitEvent()
             }
         } label: {
@@ -200,6 +177,7 @@ struct SaveEventButton: View {
             .foregroundStyle(settingsManager.accentColor)
             .background(settingsManager.primaryColor)
             .cornerRadius(12)
+            .shadow(color: settingsManager.textColor.opacity(0.3), radius: 3)
         }
         .alert("Error", isPresented: $showEventError) {
             Button("OK") { }

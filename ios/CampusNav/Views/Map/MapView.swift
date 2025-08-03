@@ -43,7 +43,8 @@ var specialAbbrs: [String] = [
     "BGH",
     "LS1",
     "SEA",
-    "SJH"
+    "SJH",
+    "NHB"
 ]
 
 enum GeoJSONLayer : String {
@@ -78,6 +79,7 @@ struct MapBoxMapView: View {
                         .lineWidth(10)
                         .lineBorderWidth(2)
                 }
+                    .lineEmissiveStrength(1.0)
                     .lineCap(.round)
                     .slot(.middle)
                 
@@ -147,12 +149,12 @@ struct MapBoxMapView: View {
                         .textField(Exp(.get) { "Building_Abbr" })
                         .textColor(
                             eventVM.eventBuildingAbbr.isEmpty
-                            ? Exp(.literal) { UIColor.darkGray }
+                            ? Exp(.literal) { settingsManager.darkMode ? UIColor.offWhite : UIColor.darkGray }
                             : Exp(.match) {
                                 Exp(.get) { "Building_Abbr" }
                                 eventVM.eventBuildingAbbr
                                 UIColor.offWhite
-                                UIColor.darkGray
+                                settingsManager.darkMode ? UIColor.offWhite : UIColor.darkGray
                             }
                         )
                         .textSize(7)
@@ -208,15 +210,16 @@ struct MapBoxMapView: View {
                                     // Is it an actual building?
                                     guard let polygon = feature.geometry.polygon else {
                                         print("Non-polygon geometry")
-                                        navState.showNavigationCard = true
+                                        if buildingAbbr != "" {
+                                            print("THIS ONE x1")
+                                            navState.showNavigationCard = true
+                                        }
                                         return false
                                     }
+                                    navState.showNavigationCard = true
                                     buildingVM.selectedBuilding = Building(abbr: buildingAbbr, name: selectedName, photoURL: photoURL)
                                     withViewportAnimation(.easeInOut(duration: 0.5)) {
                                         viewport = Viewport.camera(center: polygon.center, zoom: 16.5)
-                                    }
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                                        navState.showNavigationCard = true
                                     }
                                 } else {
                                     resetSelected()
@@ -272,7 +275,7 @@ struct MapBoxMapView: View {
                 }
             }
             // Custom map style
-            .mapStyle(MapStyle(uri: StyleURI(rawValue: "mapbox://styles/jonahblackmon/cmd3rt0a900gz01qnddu2cdpm")!))
+            .mapStyle(MapStyle(uri: StyleURI(rawValue: settingsManager.darkMode ? "mapbox://styles/jonahblackmon/cmduybt7d001801qoemoc5hg2" : "mapbox://styles/jonahblackmon/cmd3rt0a900gz01qnddu2cdpm")!))
             // Loads all necessary information on map load
             .onAppear {
                 loadGeoJSON(url: "Inverted_UT_Campus_Boundary", layer: .inverted)

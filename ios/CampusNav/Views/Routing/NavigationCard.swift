@@ -102,7 +102,7 @@ struct NavigationCard: View {
             VStack {
                 BuildingImageView()
                     .environmentObject(buildingVM)
-                    .shadow(color: .black.opacity(0.3), radius: 20)
+                    .shadow(color: settingsManager.textColor.opacity(0.3), radius: 20)
                     .frame(height: 305)
                 VStack(alignment: .center) {
                     HStack {
@@ -111,6 +111,7 @@ struct NavigationCard: View {
                         Spacer()
                         FavoritesButton(building: buildingVM.selectedBuilding ?? Building(abbr: "", name: "", photoURL: ""))
                             .environmentObject(settingsManager)
+                            .foregroundStyle(settingsManager.accentColor)
                     }
                     .zIndex(1)
                     HStack {
@@ -122,9 +123,10 @@ struct NavigationCard: View {
                     NavigateButton()
                         .environmentObject(navState)
                         .environmentObject(settingsManager)
+                        .shadow(color: settingsManager.textColor.opacity(0.3), radius: 3)
                 }
                 .frame(maxWidth: 300)
-                .foregroundStyle(settingsManager.primaryColor)
+                .foregroundStyle(settingsManager.textColor)
                 .padding()
                 .onChange(of: distance) {
                     displayTime = meters_to_time(meters: navigationVM.distance)

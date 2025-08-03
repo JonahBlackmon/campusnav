@@ -83,14 +83,10 @@ struct LocationSearchButton: View {
                 text: $eventSearchText,
                 prompt: Text("Choose a location")
                     .font(.system(size: 14))
-                    .foregroundColor(settingsManager.primaryColor.opacity(0.8))
+                    .foregroundColor(settingsManager.accentColor.opacity(0.8))
             )
             .multilineTextAlignment(.leading)
             .focused($locationSearchFocus)
         }
     }
 }
-
-//#Preview {
-//    LocationSearch()
-//}

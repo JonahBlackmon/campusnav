@@ -46,7 +46,7 @@ struct GenericIcon: View {
             }
             .sensoryFeedback(.impact(flexibility: .rigid, intensity: 1.0), trigger: animate)
             .padding()
-            .shadow(color: .black.opacity(0.5), radius: 5)
+            .shadow(color: settingsManager.textColor.opacity(0.3), radius: 3)
             .offset(x: navStateVar ? 0 : offset)
     }
 }

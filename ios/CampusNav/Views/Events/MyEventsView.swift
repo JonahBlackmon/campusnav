@@ -27,7 +27,7 @@ struct MyEventsView: View {
                 }
             ZStack {
                 settingsManager.primaryColor
-                if !eventVM.eventBuildings.isEmpty {
+                if !settingsManager.events.isEmpty {
                     ScrollView {
                         ForEach(Array(settingsManager.events.keys.enumerated()), id: \.element) { index, key in
                             MyEventItem(event: settingsManager.events[key] ?? nil, index: index)
@@ -40,6 +40,7 @@ struct MyEventsView: View {
                     }
                 } else {
                     Text("Try making some Events!")
+                        .foregroundStyle(settingsManager.textColor)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

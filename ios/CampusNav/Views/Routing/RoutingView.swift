@@ -27,7 +27,7 @@ struct RoutingTop: View {
                     .frame(height: sheetHeight / 2)
                     .mask(
                         LinearGradient(
-                            colors: [.black, .clear],
+                            colors: [settingsManager.textColor, .clear],
                             startPoint: .bottom,
                             endPoint: .top
                         )

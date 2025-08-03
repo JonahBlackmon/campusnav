@@ -30,5 +30,6 @@ struct EndRouteButton: View {
         .padding([.leading, .trailing, .bottom], 16)
         .padding(.bottom, 10)
         .transition(.move(edge: .bottom))
+        .shadow(color: settingsManager.textColor.opacity(0.3), radius: 3)
     }
 }

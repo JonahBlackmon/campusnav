@@ -40,6 +40,7 @@ struct DateSelector: View {
             MultiDatePicker(
                 "Pick a date",
                 selection: $date)
+            .colorScheme(.light)
             .padding(.leading)
             .padding(.trailing)
         }
@@ -50,12 +51,33 @@ struct TimeSelector: View {
     @EnvironmentObject var settingsManager: SettingsManager
     @Binding var time: Date
     var body: some View {
-        DatePicker("Select Time", selection: $time, displayedComponents: .hourAndMinute)
+        DatePicker("", selection: $time, displayedComponents: .hourAndMinute)
+            .colorScheme(settingsManager.darkMode ? .dark : .light)
             .datePickerStyle(.compact)
             .labelsHidden()
             .tint(settingsManager.accentColor)
-            .background(Color.brightOrange.opacity(0.5))
             .cornerRadius(8)
+    }
+}
+
+struct DurationSelector: View {
+    @EnvironmentObject var settingsManager: SettingsManager
+    @Binding var time: Date
+
+    var body: some View {
+        DatePicker("", selection: $time, displayedComponents: .hourAndMinute)
+            .colorScheme(settingsManager.darkMode ? .dark : .light)
+            .datePickerStyle(.compact)
+            .tint(settingsManager.accentColor)
+            .cornerRadius(8)
+            .environment(\.locale, Locale(identifier: "en_GB"))
+    }
+    func formatTime(date: Date) -> String {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.hour, .minute], from: date)
+        let hour = components.hour ?? 0
+        let minute = components.minute ?? 0
+        return String(format: "%02dh %02dm", hour, minute)
     }
 }
 
@@ -66,10 +88,10 @@ struct CompactDateSelector: View {
     @Binding var date: Date
     var body: some View {
         DatePicker("", selection: $date, displayedComponents: .date)
+            .colorScheme(settingsManager.darkMode ? .dark : .light)
             .datePickerStyle(.compact)
             .labelsHidden()
             .tint(settingsManager.accentColor)
-            .background(Color.brightOrange.opacity(0.5))
             .cornerRadius(8)
     }
 }

@@ -87,7 +87,7 @@ struct SearchItem: View {
                         .overlay(settingsManager.textColor)
                 }
             }
-            .foregroundStyle(.black.opacity(0.8))
+            .foregroundStyle(settingsManager.textColor.opacity(0.8))
             .padding()
             .opacity(show ? 1 : 0)
             .offset(y: show ? 0 : 20)
@@ -164,7 +164,7 @@ struct SearchButton: View {
                     "",
                     text: $headerVM.searchText,
                     prompt: Text("E.g. PCL...")
-                        .foregroundColor(settingsManager.primaryColor.opacity(0.8))
+                        .foregroundColor(settingsManager.textColor.opacity(0.8))
                         .italic()
                 )
                 .multilineTextAlignment(.leading)
@@ -179,7 +179,7 @@ struct SearchButton: View {
             searchFocused = headerVM.ExitHeader(navState: navState)
         } label: {
             Image(systemName: "chevron.backward")
-                .foregroundStyle(.black.opacity(0.3))
+                .foregroundStyle(settingsManager.textColor.opacity(0.3))
         }
     }
 }

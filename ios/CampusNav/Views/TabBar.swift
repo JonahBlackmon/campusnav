@@ -59,23 +59,59 @@ struct CustomTabBar: View {
             CustomButton(action: { handleTabTap(for: tab.0) }, content:
                         ZStack {
                             VStack {
-                                tabButtonIcon(tabName: tab.0, iconName: tab.1, toggles: $toggles)
+                                tabButtonSystemIcon(tabName: tab.0, iconName: tab.1, toggles: $toggles)
                                     .environmentObject(navState)
+                                    .environmentObject(settingsManager)
                                     .keyframeAnimator(initialValue: TabButtonProperties(), trigger: toggle) {
                                         content, value in
                                         content
                                             .scaleEffect(value.scale)
+                                            .scaleEffect(x: value.horizontalStretch)
+                                            .scaleEffect(y: value.verticalStretch)
+                                            .rotationEffect(Angle(degrees: value.rotation))
                                     } keyframes: { _ in
                                         KeyframeTrack(\.scale) {
-                                            CubicKeyframe(0.5, duration: animationDuration * 0.15)
-                                            CubicKeyframe(1, duration: animationDuration * 0.15)
+                                            if tab.0 == "Settings" {
+                                                CubicKeyframe(0.5, duration: animationDuration * 0.15)
+                                                CubicKeyframe(1.25, duration: animationDuration * 0.15)
+                                                CubicKeyframe(1.0, duration: animationDuration * 0.15)
+                                            } else {
+                                                CubicKeyframe(0.5, duration: animationDuration * 0.15)
+                                                CubicKeyframe(1, duration: animationDuration * 0.15)
+                                            }
+                                        }
+                                        KeyframeTrack(\.horizontalStretch) {
+                                            if tab.0 == "Map" {
+                                                CubicKeyframe(0.1, duration: animationDuration * 0.15)
+                                                CubicKeyframe(1.25, duration: animationDuration * 0.15)
+                                                CubicKeyframe(0.9, duration: animationDuration * 0.15)
+                                                CubicKeyframe(1, duration: animationDuration * 0.15)
+                                            } else {
+                                                CubicKeyframe(1.0, duration: animationDuration * 0.6)
+                                            }
+                                        }
+                                        KeyframeTrack(\.verticalStretch) {
+                                            if tab.0 == "Events" {
+                                                CubicKeyframe(0.1, duration: animationDuration * 0.15)
+                                                CubicKeyframe(1.25, duration: animationDuration * 0.15)
+                                                CubicKeyframe(0.9, duration: animationDuration * 0.15)
+                                                CubicKeyframe(1, duration: animationDuration * 0.15)
+                                            } else {
+                                                CubicKeyframe(1.0, duration: animationDuration * 0.6)
+                                            }
+                                        }
+                                        KeyframeTrack(\.rotation) {
+                                            if tab.0 == "Settings" {
+                                                CubicKeyframe(270, duration: animationDuration * 0.6)
+                                            } else {
+                                                CubicKeyframe(0.0, duration: animationDuration * 0.6)
+                                            }
                                         }
                                     }
                                 tabButtonText(tab.0)
                                     .opacity(navState.currentView == tab.0 ? 1.0 : 0.6)
                             }
                         }
-//                        .frame(maxWidth: .infinity)
                     )
             .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.5), trigger: navState.currentView)
         )
@@ -84,9 +120,27 @@ struct CustomTabBar: View {
     private func tabButtonText(_ text: String) -> some View {
         Text(text)
             .font(.system(size: 10))
-            .foregroundStyle(settingsManager.textColor)
+            .foregroundStyle(settingsManager.accentColor)
     }
 
+    struct tabButtonSystemIcon: View {
+        var tabName: String
+        var iconName: String
+        @Binding var toggles: [String: (Bool, Bool)]
+        @EnvironmentObject var navState: NavigationUIState
+        @EnvironmentObject var settingsManager: SettingsManager
+        var name: String {
+            return navState.currentView == tabName && tabName != "Events" ? iconName + ".fill" : iconName
+        }
+        
+        var body: some View {
+            ZStack {
+                Image(systemName: name)
+                    .foregroundStyle(navState.currentView == tabName ? settingsManager.accentColor : settingsManager.textColor)
+                    .font(.system(size: 30))
+            }
+        }
+    }
     
     struct tabButtonIcon: View {
         var tabName: String
@@ -125,6 +179,9 @@ struct CustomTabBar: View {
     
     struct TabButtonProperties {
         var scale: Double = 1.0
+        var horizontalStretch: Double = 1.0
+        var verticalStretch: Double = 1.0
+        var rotation: Double = 0.0
     }
     
     private func handleTabTap(for tabName: String) {

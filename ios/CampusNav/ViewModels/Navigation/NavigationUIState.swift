@@ -13,4 +13,5 @@ class NavigationUIState: ObservableObject {
     @Published var isNavigating = false
     @Published var isSearching = false
     @Published var events = false
+    @Published var settings = false
 }
