@@ -17,15 +17,9 @@ struct ContentView: View {
     @EnvironmentObject var navCoord: NavigationCoordinator
     @EnvironmentObject var headerVM: HeaderViewModel
     @EnvironmentObject var firebaseManager: FirebaseManager
+    @EnvironmentObject var eventVM: EventViewModel
     
-    let tabBar: [(String, String)] = [("record", "mic.fill"), ("home", "house.fill"), ("profile", "book.fill")]
-    
-    var collegePrimary: Color {
-       return settingsManager.collegePrimary
-    }
-    var collegeSecondary: Color {
-       return settingsManager.collegeSecondary
-    }
+    let tabBar: [(String, String)] = [("Map", "map"), ("Events", "calendar"), ("Settings", "gearshape")]
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -39,7 +33,7 @@ struct ContentView: View {
         }
         .onChange(of: buildingVM.selectedBuilding) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                if navState.showNavigationCard {
+                if navState.showNavigationCard && buildingVM.selectedBuilding?.abbr != "" {
                     navCoord.updateCard()
                 }
             }
@@ -55,6 +49,22 @@ struct ContentView: View {
                 navigationVM.proximityTimer = nil
             }
         }
+        .onChange(of: navState.currentView) {
+            let events: Bool = navState.currentView == "Events"
+            let settings: Bool = navState.currentView == "Settings"
+            withAnimation(.easeInOut(duration: 0.3)) {
+                navState.events = events
+                navState.settings = settings
+            }
+            if !events {
+                eventVM.ExitEvent()
+            } else {
+                Task {
+                    await eventVM.loadCurrentEvents(firebaseManager: firebaseManager, buildingVM: buildingVM)
+                }
+                headerVM.ExitHeader(navState: navState)
+            }
+        }
     }
     
 //    private var addEvent: some View {
@@ -68,25 +78,12 @@ struct ContentView: View {
 //        }
 //        .background(Color.white)
 //    }
-//    
-//    private var myEvents: some View {
-//        VStack {
-//            ScrollView {
-//                ForEach(Array(settingsManager.events.keys.enumerated()), id: \.element) { index, key in
-//                    Button {
-//                        firebaseManager.deleteEvent(ref: key, settingsManager: settingsManager)
-//                    } label: {
-//                        Text(key)
-//                    }
-//                }
-//            }
-//        }
-//    }
     
     private var cardView: some View {
         ZStack {
-            collegePrimary.edgesIgnoringSafeArea(.all)
+            settingsManager.primaryColor.edgesIgnoringSafeArea(.all)
             NavigationCard()
+                .environmentObject(settingsManager)
                 .environmentObject(navState)
                 .environmentObject(navigationVM)
                 .environmentObject(buildingVM)
@@ -98,6 +95,7 @@ struct ContentView: View {
         ZStack {
             if navState.showArrival {
                 ArrivalScreen()
+                    .environmentObject(settingsManager)
                     .environmentObject(navState)
                     .environmentObject(buildingVM)
             }
@@ -108,9 +106,11 @@ struct ContentView: View {
         ZStack {
             if navState.isNavigating {
                 RoutingTop()
+                    .environmentObject(settingsManager)
                     .environmentObject(navigationVM)
                     .transition(.move(edge: .top))
                 RoutingBottom(resetData: navCoord.resetData)
+                    .environmentObject(settingsManager)
                     .environmentObject(navigationVM)
                     .transition(.move(edge: .bottom))
             }
@@ -126,20 +126,32 @@ struct ContentView: View {
     @ViewBuilder
     private var currentViewContent: some View {
         switch navState.currentView {
-        case "record", "explore":
+        case "Map":
             MapView()
                 .environmentObject(buildingVM)
                 .environmentObject(navigationVM)
                 .environmentObject(navState)
+                .environmentObject(eventVM)
+                .environmentObject(settingsManager)
                 .ignoresSafeArea()
                 .preferredColorScheme(.light)
-        case "profile":
-            Text("Hello World")
+        case "Events":
+            EventView()
+                .environmentObject(buildingVM)
+                .environmentObject(eventVM)
+                .environmentObject(navState)
+                .environmentObject(firebaseManager)
+                .environmentObject(settingsManager)
+        case "Settings":
+            SettingsView2()
+                .environmentObject(settingsManager)
         default:
             MapView()
+                .environmentObject(settingsManager)
                 .environmentObject(buildingVM)
                 .environmentObject(navigationVM)
                 .environmentObject(navState)
+                .environmentObject(eventVM)
                 .ignoresSafeArea()
                 .preferredColorScheme(.light)
         }
@@ -148,12 +160,12 @@ struct ContentView: View {
     private var mainContentView: some View {
         ZStack() {
             contentArea
-            HeaderView(collegePrimary: collegePrimary, collegeSecondary: collegeSecondary)
+            HeaderView()
                 .environmentObject(headerVM)
                 .environmentObject(navState)
                 .environmentObject(buildingVM)
                 .environmentObject(settingsManager)
-            CustomTabBar(tabItems: tabBar, collegePrimary: settingsManager.collegePrimary, collegeSecondary: settingsManager.collegeSecondary)
+            CustomTabBar(tabItems: tabBar)
                 .environmentObject(navState)
         }
     }

@@ -7,8 +7,6 @@
 import SwiftUI
 
 struct SearchView: View {
-    let collegePrimary: Color
-    let collegeSecondary: Color
     @EnvironmentObject var navState: NavigationUIState
     @EnvironmentObject var buildingVM: BuildingViewModel
     @EnvironmentObject var settingsManager: SettingsManager
@@ -21,7 +19,7 @@ struct SearchView: View {
     
     var body: some View {
         ZStack() {
-            Color.offWhite.opacity(1.0)
+            settingsManager.primaryColor.opacity(1.0)
                 .ignoresSafeArea()
                 .transition(.opacity)
                 .onTapGesture {
@@ -33,7 +31,6 @@ struct SearchView: View {
                         Array(displayBuildings.enumerated()), id: \.element.id) { index, building in
                             SearchItem(
                                     building: building,
-                                    collegePrimary: collegePrimary,
                                     index: index,
                                     onSelect: {
                                         searchFocused = headerVM.ExitHeader(navState: navState)
@@ -41,6 +38,7 @@ struct SearchView: View {
                                         buildingVM.selectedBuilding = building
                                     }
                                 )
+                            .environmentObject(settingsManager)
                     }
                 }
             }
@@ -63,11 +61,10 @@ struct SearchView: View {
 }
 
 struct SearchItem: View {
+    @EnvironmentObject var settingsManager: SettingsManager
     let building: Building
-    let collegePrimary: Color
     let index: Int
     let onSelect: () -> Void
-    
     @State var show: Bool = false
     
     var body: some View {
@@ -78,16 +75,19 @@ struct SearchItem: View {
                 Image(systemName: "location.circle.fill")
                 .font(.system(size: 22))
                 .padding(.trailing, 5)
+                .foregroundStyle(settingsManager.textColor)
                 VStack(alignment: .leading) {
                     Text(building.name)
                         .font(.system(size: 20))
+                        .foregroundStyle(settingsManager.textColor)
                     Text(building.abbr)
                         .font(.system(size: 10))
-                        .foregroundStyle(collegePrimary)
+                        .foregroundStyle(settingsManager.accentColor)
                     Divider()
+                        .overlay(settingsManager.textColor)
                 }
             }
-            .foregroundStyle(.black.opacity(0.8))
+            .foregroundStyle(settingsManager.textColor.opacity(0.8))
             .padding()
             .opacity(show ? 1 : 0)
             .offset(y: show ? 0 : 20)
@@ -104,9 +104,8 @@ struct SearchItem: View {
 struct SearchButton: View {
     @EnvironmentObject var headerVM: HeaderViewModel
     @EnvironmentObject var navState: NavigationUIState
+    @EnvironmentObject var settingsManager: SettingsManager
     @FocusState.Binding var searchFocused: Bool
-    let collegePrimary: Color
-    let collegeSecondary: Color
     var body: some View {
         Button {
             withAnimation(.easeInOut(duration: 0.4)) {
@@ -131,7 +130,7 @@ struct SearchButton: View {
                         )
                 }
                 ZStack {
-                    collegePrimary
+                    settingsManager.primaryColor
                     SearchButtonLabel
                         .padding(.horizontal, 16)
                         .frame(maxWidth: .infinity, alignment: navState.isSearching ? .leading : .center)
@@ -141,7 +140,7 @@ struct SearchButton: View {
                 .frame(maxWidth: navState.isSearching ? .infinity : 175)
                 .cornerRadius(24)
                 .animation(.spring(duration: 0.4), value: navState.isSearching)
-                .foregroundColor(collegeSecondary)
+                .foregroundColor(settingsManager.accentColor)
             }
         }
     }
@@ -165,7 +164,7 @@ struct SearchButton: View {
                     "",
                     text: $headerVM.searchText,
                     prompt: Text("E.g. PCL...")
-                        .foregroundColor(.offWhite.opacity(0.8))
+                        .foregroundColor(settingsManager.textColor.opacity(0.8))
                         .italic()
                 )
                 .multilineTextAlignment(.leading)
@@ -180,7 +179,7 @@ struct SearchButton: View {
             searchFocused = headerVM.ExitHeader(navState: navState)
         } label: {
             Image(systemName: "chevron.backward")
-                .foregroundStyle(.black.opacity(0.3))
+                .foregroundStyle(settingsManager.textColor.opacity(0.3))
         }
     }
 }

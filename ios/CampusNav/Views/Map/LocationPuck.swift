@@ -9,8 +9,9 @@ import SwiftUI
 let puckAnimationDuration = 2.0
 
 struct LocationPuck: View {
+    @EnvironmentObject var settingsManager: SettingsManager
     @State var value: CGFloat = 6
-    static let gradientStart = Color.burntOrange.opacity(0.7)
+    var gradientStart: Color { settingsManager.accentColor.opacity(0.7) }
     static let gradientEnd = Color.clear
     @EnvironmentObject var navigationVM: NavigationViewModel
     
@@ -18,7 +19,7 @@ struct LocationPuck: View {
         ZStack {
             Trapezoid()
                 .fill(
-                    LinearGradient(colors: [Self.gradientStart, Self.gradientEnd], startPoint: .top, endPoint: .bottom)
+                    LinearGradient(colors: [gradientStart, Self.gradientEnd], startPoint: .top, endPoint: .bottom)
                 )
                 .offset(y: 30)
                 .rotationEffect(Angle(degrees: (navigationVM.currentDirection ?? 0) + 180.0))
@@ -31,11 +32,11 @@ struct LocationPuck: View {
                     .frame(width: 15, height: 15)
             }
             .padding()
-            .background(Color.offWhite)
+            .background(settingsManager.primaryColor)
             .clipShape(Circle())
             .overlay(
                 Circle()
-                    .stroke(Color.burntOrange, lineWidth: value)
+                    .stroke(settingsManager.accentColor, lineWidth: value)
                     .animation(
                         .easeInOut(duration: 2.0)
                             .repeatForever(autoreverses: true),

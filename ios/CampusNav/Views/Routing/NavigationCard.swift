@@ -67,8 +67,7 @@ struct BuildingImageView: View {
 
 
 struct NavigateButton: View {
-    let collegeSecondary: Color
-    let collegePrimary: Color
+    @EnvironmentObject var settingsManager: SettingsManager
     @EnvironmentObject var navState: NavigationUIState
     var body: some View {
         Button {
@@ -80,8 +79,8 @@ struct NavigateButton: View {
             }
             .frame(maxWidth: .infinity)
             .padding()
-            .foregroundStyle(collegePrimary)
-            .background(collegeSecondary)
+            .foregroundStyle(settingsManager.accentColor)
+            .background(settingsManager.primaryColor)
             .cornerRadius(12)
         }
         
@@ -90,8 +89,6 @@ struct NavigateButton: View {
 
 
 struct NavigationCard: View {
-    let collegePrimary: Color = .burntOrange
-    let collegeSecondary: Color = .offWhite
     @State var displayTime: String = ""
     @EnvironmentObject var settingsManager: SettingsManager
     @EnvironmentObject var buildingVM: BuildingViewModel
@@ -105,7 +102,7 @@ struct NavigationCard: View {
             VStack {
                 BuildingImageView()
                     .environmentObject(buildingVM)
-                    .shadow(color: .black.opacity(0.3), radius: 20)
+                    .shadow(color: settingsManager.textColor.opacity(0.3), radius: 20)
                     .frame(height: 305)
                 VStack(alignment: .center) {
                     HStack {
@@ -114,6 +111,7 @@ struct NavigationCard: View {
                         Spacer()
                         FavoritesButton(building: buildingVM.selectedBuilding ?? Building(abbr: "", name: "", photoURL: ""))
                             .environmentObject(settingsManager)
+                            .foregroundStyle(settingsManager.accentColor)
                     }
                     .zIndex(1)
                     HStack {
@@ -122,11 +120,13 @@ struct NavigationCard: View {
                         Spacer()
                     }
                     .frame(alignment: .leading)
-                    NavigateButton(collegeSecondary: collegeSecondary, collegePrimary: collegePrimary)
+                    NavigateButton()
                         .environmentObject(navState)
+                        .environmentObject(settingsManager)
+                        .shadow(color: settingsManager.textColor.opacity(0.3), radius: 3)
                 }
                 .frame(maxWidth: 300)
-                .foregroundStyle(collegeSecondary)
+                .foregroundStyle(settingsManager.textColor)
                 .padding()
                 .onChange(of: distance) {
                     displayTime = meters_to_time(meters: navigationVM.distance)

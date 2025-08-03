@@ -23,20 +23,37 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 struct CampusNavApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject var navCoord: NavigationCoordinator = NavigationCoordinator()
+    @StateObject var settingsManager: SettingsManager = SettingsManager()
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .preferredColorScheme(settingsManager.darkMode ? .dark : .light)
+                .environmentObject(settingsManager)
                 .environmentObject(navCoord.buildingVM)
                 .environmentObject(navCoord.headerVM)
                 .environmentObject(navCoord.navState)
                 .environmentObject(navCoord.navigationVM)
-                .environmentObject(navCoord.settingsManager)
                 .environmentObject(navCoord.firebaseManager)
+                .environmentObject(navCoord.eventVM)
                 .environmentObject(navCoord)
                 .onAppear {
                     navCoord.buildingVM.loadBuildings(pathName: "buildings_simple")
+                    Task {
+                        await navCoord.eventVM.loadCurrentEvents(firebaseManager: navCoord.firebaseManager, buildingVM: navCoord.buildingVM)
+                    }
                 }
         }
     }
 }
 
+#Preview {
+    ContentView()
+        .environmentObject(BuildingViewModel())
+        .environmentObject(HeaderViewModel())
+        .environmentObject(NavigationUIState())
+        .environmentObject(NavigationViewModel(currentCoordinates: [], currentNodes: []))
+        .environmentObject(SettingsManager())
+        .environmentObject(FirebaseManager())
+        .environmentObject(EventViewModel())
+        .environmentObject(NavigationCoordinator())
+}

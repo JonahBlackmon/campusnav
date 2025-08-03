@@ -11,22 +11,23 @@ struct RoutingTop: View {
     @State var test: [Int] = Array(repeating: 1, count: 300)
     @State var sheetHeight: CGFloat = collapsedHeight
     @EnvironmentObject var navigationVM: NavigationViewModel
+    @EnvironmentObject var settingsManager: SettingsManager
     var body: some View {
         TopSheetView(sheetHeight: $sheetHeight, expanded: $expanded, content:
             ZStack(alignment: .bottom) {
                 directionsList
                 if !expanded {
                     Capsule()
-                        .fill(.offWhite)
+                        .fill(settingsManager.textColor)
                         .frame(width: 50, height: 5)
                         .padding(.bottom, 5)
                 }
                 
-                Color.burntOrange
+                settingsManager.primaryColor
                     .frame(height: sheetHeight / 2)
                     .mask(
                         LinearGradient(
-                            colors: [.black, .clear],
+                            colors: [settingsManager.textColor, .clear],
                             startPoint: .bottom,
                             endPoint: .top
                         )
@@ -34,7 +35,7 @@ struct RoutingTop: View {
                     .allowsHitTesting(false)
                     .opacity(sheetHeight > UIScreen.main.bounds.height * 0.4 ? 1 : 0)
                 Image(systemName: "chevron.compact.up")
-                    .foregroundStyle(.offWhite)
+                .foregroundStyle(settingsManager.textColor)
                     .font(.system(size: 50))
                     .padding()
                     .opacity(sheetHeight > UIScreen.main.bounds.height * 0.4 ? 1 : 0)
@@ -66,13 +67,14 @@ struct RoutingTop: View {
             .padding(.top, 70)
             .frame(height: sheetHeight)
             .frame(maxWidth: .infinity)
-            .background(.burntOrange)
+            .background(settingsManager.primaryColor)
         }
     }
 }
 
 struct RoutingBottom: View {
     @EnvironmentObject var navigationVM: NavigationViewModel
+    @EnvironmentObject var settingsManager: SettingsManager
     var resetData: () -> Void
     let dateFormatter: DateFormatter = {
         let df = DateFormatter()
@@ -89,13 +91,13 @@ struct RoutingBottom: View {
                         Text("\((10 * Int(distance / 10))) m")
                             .font(.system(size: 20))
                             .fontWeight(.bold)
-                            .foregroundStyle(.offWhite)
+                            .foregroundStyle(settingsManager.textColor)
                         HStack {
                             Image(systemName: "figure.walk")
                             Text(meters_to_time(meters: distance))
                         }
                         .font(.system(size: 20))
-                        .foregroundStyle(.offWhite.opacity(0.7))
+                        .foregroundStyle(settingsManager.textColor.opacity(0.7))
                     }
                     .padding()
                     
@@ -105,10 +107,10 @@ struct RoutingBottom: View {
                         Text("\(dateFormatter.string(from: arrivalDate))")
                             .font(.system(size: 20))
                             .fontWeight(.bold)
-                            .foregroundStyle(.offWhite)
+                            .foregroundStyle(settingsManager.textColor)
                         Text("Arrival")
                             .font(.system(size: 20))
-                            .foregroundStyle(.offWhite.opacity(0.7))
+                            .foregroundStyle(settingsManager.accentColor.opacity(0.7))
                     }
                     
                     Spacer()
@@ -119,7 +121,7 @@ struct RoutingBottom: View {
                     } label: {
                         Image(systemName: "chevron.up.circle.fill")
                             .font(.system(size: 25))
-                            .foregroundStyle(.offWhite.opacity(0.7))
+                            .foregroundStyle(settingsManager.textColor.opacity(0.7))
                             .rotationEffect(expanded ? Angle(degrees: 180) : Angle(degrees: 0))
                     }
                 }
@@ -129,7 +131,7 @@ struct RoutingBottom: View {
                     EndRouteButton(resetData: resetData)
                 }
             }
-            .background(.burntOrange)
+            .background(settingsManager.primaryColor)
             .frame(maxWidth: .infinity)
             .animation(.easeOut(duration: 0.3), value: expanded)
             .transition(.move(edge: .bottom))

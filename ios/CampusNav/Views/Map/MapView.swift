@@ -14,12 +14,16 @@ struct MapView: View {
     @EnvironmentObject var navState: NavigationUIState
     @EnvironmentObject var buildingVM: BuildingViewModel
     @EnvironmentObject var navigationVM: NavigationViewModel
+    @EnvironmentObject var eventVM: EventViewModel
+    @EnvironmentObject var settingsManager: SettingsManager
     let starting_position: MapCameraPosition = .region(.init(center: .init(latitude: 30.2850, longitude: -97.7335), latitudinalMeters: 1300, longitudinalMeters: 1300))
     var body: some View {
         MapBoxMapView()
             .environmentObject(navState)
             .environmentObject(navigationVM)
             .environmentObject(buildingVM)
+            .environmentObject(eventVM)
+            .environmentObject(settingsManager)
     }
 }
 
@@ -39,7 +43,8 @@ var specialAbbrs: [String] = [
     "BGH",
     "LS1",
     "SEA",
-    "SJH"
+    "SJH",
+    "NHB"
 ]
 
 enum GeoJSONLayer : String {
@@ -61,17 +66,20 @@ struct MapBoxMapView: View {
     @EnvironmentObject var navState: NavigationUIState
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var buildingVM: BuildingViewModel
+    @EnvironmentObject var eventVM: EventViewModel
+    @EnvironmentObject var settingsManager: SettingsManager
     var body: some View {
         MapReader { proxy in
             Map(viewport: $viewport) {
                 // General route styling
                 PolylineAnnotationGroup() {
                     PolylineAnnotation(lineCoordinates: navigationVM.currentCoordinates)
-                        .lineColor(.lightOrange)
-                        .lineBorderColor(.burntOrange)
+                        .lineColor(UIColor(settingsManager.lighterAccent))
+                        .lineBorderColor(UIColor(settingsManager.accentColor))
                         .lineWidth(10)
                         .lineBorderWidth(2)
                 }
+                    .lineEmissiveStrength(1.0)
                     .lineCap(.round)
                     .slot(.middle)
                 
@@ -140,20 +148,24 @@ struct MapBoxMapView: View {
                     SymbolLayer(id: "building-labels", source: "ut-buildings")
                         .textField(Exp(.get) { "Building_Abbr" })
                         .textColor(
-                            Exp(.match) {
+                            eventVM.eventBuildingAbbr.isEmpty
+                            ? Exp(.literal) { settingsManager.darkMode ? UIColor.offWhite : UIColor.darkGray }
+                            : Exp(.match) {
                                 Exp(.get) { "Building_Abbr" }
-                                specialAbbrs
+                                eventVM.eventBuildingAbbr
                                 UIColor.offWhite
-                                UIColor.darkGray
+                                settingsManager.darkMode ? UIColor.offWhite : UIColor.darkGray
                             }
                         )
                         .textSize(7)
                         .textFont(["Open Sans Bold"])
-                        .textHaloColor(StyleColor(.burntOrange))
+                        .textHaloColor(UIColor(settingsManager.accentColor))
                         .textHaloWidth(
-                            Exp(.match) {
+                            eventVM.eventBuildingAbbr.isEmpty
+                            ? Exp(.literal) { 0.0 }
+                            : Exp(.match) {
                                 Exp(.get) { "Building_Abbr" }
-                                specialAbbrs
+                                eventVM.eventBuildingAbbr
                                 1.0
                                 0.0
                             }
@@ -198,15 +210,16 @@ struct MapBoxMapView: View {
                                     // Is it an actual building?
                                     guard let polygon = feature.geometry.polygon else {
                                         print("Non-polygon geometry")
-                                        navState.showNavigationCard = true
+                                        if buildingAbbr != "" {
+                                            print("THIS ONE x1")
+                                            navState.showNavigationCard = true
+                                        }
                                         return false
                                     }
+                                    navState.showNavigationCard = true
                                     buildingVM.selectedBuilding = Building(abbr: buildingAbbr, name: selectedName, photoURL: photoURL)
                                     withViewportAnimation(.easeInOut(duration: 0.5)) {
                                         viewport = Viewport.camera(center: polygon.center, zoom: 16.5)
-                                    }
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                                        navState.showNavigationCard = true
                                     }
                                 } else {
                                     resetSelected()
@@ -262,7 +275,7 @@ struct MapBoxMapView: View {
                 }
             }
             // Custom map style
-            .mapStyle(MapStyle(uri: StyleURI(rawValue: "mapbox://styles/jonahblackmon/cmd3rt0a900gz01qnddu2cdpm")!))
+            .mapStyle(MapStyle(uri: StyleURI(rawValue: settingsManager.darkMode ? "mapbox://styles/jonahblackmon/cmduybt7d001801qoemoc5hg2" : "mapbox://styles/jonahblackmon/cmd3rt0a900gz01qnddu2cdpm")!))
             // Loads all necessary information on map load
             .onAppear {
                 loadGeoJSON(url: "Inverted_UT_Campus_Boundary", layer: .inverted)

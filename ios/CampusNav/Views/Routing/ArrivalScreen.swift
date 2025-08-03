@@ -7,16 +7,16 @@
 import SwiftUI
 
 struct ArrivalScreen: View {
-    let collegePrimary: Color = .burntOrange
-    let collegeSecondary: Color = .offWhite
     @State private var isVisible: Bool = false
     @EnvironmentObject var navState: NavigationUIState
     @EnvironmentObject var buildingVM: BuildingViewModel
+    @EnvironmentObject var settingsManager: SettingsManager
     var body: some View {
         ZStack {
-            collegePrimary
-            ArrivalScreenBanner(collegeSecondary: collegeSecondary)
+            settingsManager.primaryColor
+            ArrivalScreenBanner()
                 .environmentObject(buildingVM)
+                .environmentObject(settingsManager)
         }
         .frame(maxWidth: 325, maxHeight: 75)
         .cornerRadius(12)
@@ -44,13 +44,13 @@ struct ArrivalScreen: View {
 }
 
 struct ArrivalScreenBanner: View {
-    var collegeSecondary: Color
     @EnvironmentObject var buildingVM: BuildingViewModel
+    @EnvironmentObject var settingsManager: SettingsManager
     var body: some View {
         HStack(spacing: 5) {
             BuildingImageView()
                 .environmentObject(buildingVM)
-                .shadow(color: .black.opacity(0.3), radius: 20)
+                .shadow(color: settingsManager.textColor.opacity(0.3), radius: 20)
                 .frame(width: 30, height: 30)
                 .cornerRadius(4)
             VStack(alignment: .center) {
@@ -60,7 +60,7 @@ struct ArrivalScreenBanner: View {
                 }
                 .zIndex(1)
             }
-            .foregroundStyle(collegeSecondary)
+            .foregroundStyle(settingsManager.accentColor)
         }
     }
 }
