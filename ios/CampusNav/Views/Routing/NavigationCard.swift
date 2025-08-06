@@ -44,7 +44,7 @@ struct BuildingImageView: View {
                         .frame(maxWidth: .infinity)
                         .clipped()
                 case .failure:
-                    Image("longhornImage")
+                    Image("longhorn")
                         .resizable()
                         .scaledToFill()
                         .frame(height: 305)
@@ -55,7 +55,7 @@ struct BuildingImageView: View {
                 }
             }
         } else {
-            Image("longhornImage")
+            Image("longhorn")
                 .resizable()
                 .scaledToFill()
                 .frame(height: 305)

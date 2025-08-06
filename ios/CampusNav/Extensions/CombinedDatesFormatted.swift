@@ -30,7 +30,7 @@ func combinedDatesFormatted(days: Set<DateComponents>, time: Date) -> [String] {
     return Array(Set(formattedDates)).sorted()
 }
 
-func combinedDateTimeFormatted(day: Date, time: Date) -> [String] {
+func combinedDateTimeFormatted(day: Date, time: Date) -> ([String], [Date]) {
     var calendar = Calendar.current
     calendar.timeZone = TimeZone.current
 
@@ -49,8 +49,8 @@ func combinedDateTimeFormatted(day: Date, time: Date) -> [String] {
     formatter.locale = Locale(identifier: "en_US")
 
     if let finalDate = calendar.date(from: combinedComponents) {
-        return [formatter.string(from: finalDate)]
+        return ([formatter.string(from: finalDate)], [finalDate])
     } else {
-        return []
+        return ([], [])
     }
 }

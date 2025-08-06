@@ -6,47 +6,6 @@
 //
 import SwiftUI
 
-struct DateTimeSelector: View {
-    @EnvironmentObject var settingsManager: SettingsManager
-    @Binding var date: Set<DateComponents>
-    @Binding var time: Date
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text("Select which days of the week:")
-                .fontWeight(.bold)
-                .font(.system(size: 15))
-                .foregroundStyle(settingsManager.accentColor)
-                .padding(.leading)
-                .padding(.trailing)
-            DateSelector(date: $date)
-                .tint(settingsManager.accentColor)
-            HStack {
-                Text("Select the time of day:")
-                    .fontWeight(.bold)
-                    .font(.system(size: 15))
-                    .foregroundStyle(settingsManager.accentColor)
-                    .padding(.leading)
-                    .padding(.trailing)
-                TimeSelector(time: $time)
-            }
-        }
-    }
-}
-
-struct DateSelector: View {
-    @Binding var date: Set<DateComponents>
-    var body: some View {
-        VStack {
-            MultiDatePicker(
-                "Pick a date",
-                selection: $date)
-            .colorScheme(.light)
-            .padding(.leading)
-            .padding(.trailing)
-        }
-    }
-}
-
 struct TimeSelector: View {
     @EnvironmentObject var settingsManager: SettingsManager
     @Binding var time: Date
@@ -62,24 +21,36 @@ struct TimeSelector: View {
 
 struct DurationSelector: View {
     @EnvironmentObject var settingsManager: SettingsManager
-    @Binding var time: Date
+    @Binding var duration: TimeInterval
+
+    private let durationOptions: [(label: String, seconds: TimeInterval)] = {
+        var options: [(String, TimeInterval)] = []
+        for h in 0..<24 {
+            for m in stride(from: 0, to: 60, by: 30) {
+                let seconds = TimeInterval(h * 3600 + m * 60)
+                let label = h > 0 ? "\(h)h \(m)m" : "\(m)m"
+                options.append((label, seconds))
+            }
+        }
+        return options
+    }()
 
     var body: some View {
-        DatePicker("", selection: $time, displayedComponents: .hourAndMinute)
-            .colorScheme(settingsManager.darkMode ? .dark : .light)
-            .datePickerStyle(.compact)
-            .tint(settingsManager.accentColor)
-            .cornerRadius(8)
-            .environment(\.locale, Locale(identifier: "en_GB"))
-    }
-    func formatTime(date: Date) -> String {
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.hour, .minute], from: date)
-        let hour = components.hour ?? 0
-        let minute = components.minute ?? 0
-        return String(format: "%02dh %02dm", hour, minute)
+        Picker("", selection: $duration) {
+            ForEach(durationOptions, id: \.seconds) { option in
+                Text(option.label)
+            }
+        }
+        .pickerStyle(.menu)
+        .labelsHidden()
+        .font(.system(size: 15))
+        .frame(height: 36)
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(8)
+        .tint(settingsManager.accentColor)
     }
 }
+
 
 
 

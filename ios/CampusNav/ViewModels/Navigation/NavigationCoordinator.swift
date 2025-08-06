@@ -73,8 +73,8 @@ class NavigationCoordinator: ObservableObject {
                     // We are at the destination
                     (navigationVM.currentCoordinates, navigationVM.currentNodes, navigationVM.distance) = find_route(lat: cL.latitude, lng: cL.longitude, dest_abbr: buildingVM.abbr())
                     navigationVM.directions = navigationVM.getDirections(destAbbr: buildingVM.abbr())
-                } else if distance_to_path(pos: cL, start: start, end: end) > 10 {
-                    // Strayed to far from path, need to re route
+                } else if distance_to_path(pos: cL, start: start, end: end) > 10 || navigationVM.directions.first?.distance == "0 m" {
+                    // Strayed to far from path, need to re route or we weren't facing the correct starting direction
                     (navigationVM.currentCoordinates, navigationVM.currentNodes, navigationVM.distance) = find_route(lat: cL.latitude, lng: cL.longitude, dest_abbr: buildingVM.abbr())
                     navigationVM.directions = navigationVM.getDirections(destAbbr: buildingVM.abbr())
                 }

@@ -107,7 +107,7 @@ struct DescriptionView: View {
                     }
                 } label: {
                     Text("Save")
-                        .foregroundStyle(settingsManager.primaryColor)
+                        .foregroundStyle(settingsManager.textColor)
                 }
             }
             .frame(width: 300, height: 250)

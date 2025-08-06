@@ -109,8 +109,6 @@ struct SearchButton: View {
     var body: some View {
         Button {
             withAnimation(.easeInOut(duration: 0.4)) {
-                headerVM.showSettings = false
-                headerVM.animateSettings = false
                 headerVM.animateFavorites = false
                 headerVM.showFavorites = false
                 navState.isSearching = true

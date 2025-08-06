@@ -11,7 +11,7 @@ import CoreLocation
 
 class NavigationViewModel: NSObject, ObservableObject {
     
-    private var locationManager: CLLocationManager?
+    @Published var locationManager: CLLocationManager?
     
     @Published var log: String = ""
     

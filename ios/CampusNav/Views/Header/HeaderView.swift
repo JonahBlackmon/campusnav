@@ -25,13 +25,6 @@ struct HeaderView: View {
                     .environmentObject(settingsManager)
                     .environmentObject(headerVM)
             }
-            if headerVM.showSettings {
-                SettingsView(searchFocused: $searchFocused)
-                    .environmentObject(navState)
-                    .environmentObject(buildingVM)
-                    .environmentObject(settingsManager)
-                    .environmentObject(headerVM)
-            }
             ZStack {
                 SearchButton(searchFocused: $searchFocused)
                     .environmentObject(headerVM)
@@ -39,38 +32,28 @@ struct HeaderView: View {
                     .environmentObject(settingsManager)
                     .offset(y: navState.isNavigating || navState.events || navState.settings ? -200 : 0)
                 HStack {
-                    GenericIcon(animate: $headerVM.animateSettings, navStateVar: Binding<Bool>(
-                        get: {
-                            !navState.isSearching && !navState.isNavigating && !navState.events && !navState.settings
-                        },
-                        set: { _ in }
-                    ), closedIcon: "gearshape", openIcon: "gearshape.fill", offset: -200, size: 22, onSelect: {
+                    GenericIconFromImage(animate: $headerVM.animateLocation, closedIcon: "LocationPin", openIcon: "LocationPin", size: 28, onSelect: {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             navState.isSearching = false
                             headerVM.animateFavorites = false
                             headerVM.showFavorites = false
                             searchFocused = false
-                            headerVM.animateSettings.toggle()
-                            headerVM.showSettings.toggle()
+                            headerVM.animateLocation.toggle()
+                            navState.centerLocation.toggle()
                         }
                     })
+                    .offset(x: navState.isSearching || navState.isNavigating || navState.events || navState.settings ? -200 : 0)
                     .environmentObject(settingsManager)
                     Spacer()
-                    GenericIcon(animate: $headerVM.animateFavorites, navStateVar: Binding<Bool>(
-                        get: {
-                            !navState.isSearching && !navState.isNavigating && !navState.events && !navState.settings
-                        },
-                        set: { _ in }
-                    ), closedIcon: "star", openIcon: "star.fill", offset: 200, size: 20, onSelect: {
+                    GenericIcon(animate: $headerVM.animateFavorites, closedIcon: "star", openIcon: "star.fill", size: 20, onSelect: {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             navState.isSearching = false
-                            headerVM.showSettings = false
-                            headerVM.animateSettings = false
                             searchFocused = false
                             headerVM.animateFavorites.toggle()
                             headerVM.showFavorites.toggle()
                         }
                     })
+                    .offset(x: navState.isSearching || navState.isNavigating || navState.events || navState.settings ? 200 : 0)
                     .environmentObject(settingsManager)
                 }
             }

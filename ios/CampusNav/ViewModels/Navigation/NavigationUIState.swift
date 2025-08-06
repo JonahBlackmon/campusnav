@@ -14,4 +14,5 @@ class NavigationUIState: ObservableObject {
     @Published var isSearching = false
     @Published var events = false
     @Published var settings = false
+    @Published var centerLocation = false
 }

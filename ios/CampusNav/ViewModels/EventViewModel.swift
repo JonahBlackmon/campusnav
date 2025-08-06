@@ -17,6 +17,9 @@ class EventViewModel: ObservableObject {
     @Published var eventBuildings: [Building?] = []
     @Published var eventBuildingAbbr: [String] = []
     @Published var showDescription: Bool = false
+    @Published var showFilters: Bool = false
+    @Published var selectedFilters: Set<EventTag> = []
+    @Published var filteredEvents: [Event] = []
     
     @MainActor
     func loadCurrentEvents(firebaseManager: FirebaseManager, buildingVM: BuildingViewModel) async {
@@ -32,27 +35,25 @@ class EventViewModel: ObservableObject {
         }
     }
     
+    func loadFilteredEvents() {
+        if !selectedFilters.isEmpty {
+            let selectedTagStrings = selectedFilters.map { $0.rawValue }
+            filteredEvents = activeEvents.filter { event in
+                !Set(event.tags).isDisjoint(with: selectedTagStrings)
+            }
+        }
+    }
+    
     private func filterEventsOccurringLaterToday(events: [Event]) -> [Event] {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE h:mm a"
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        
         let calendar = Calendar.current
         let now = Date()
         let todayWeekday = calendar.component(.weekday, from: now)
         
         return events.filter { event in
-            for timeString in event.event_times {
-                guard let parsedTime = formatter.date(from: timeString) else { continue }
-                
-                let parsedWeekday = calendar.component(.weekday, from: parsedTime)
+            for date in event.event_dates {
+                let parsedWeekday = calendar.component(.weekday, from: date)
                 if parsedWeekday == todayWeekday {
-                    let timeComponents = calendar.dateComponents([.hour, .minute], from: parsedTime)
-                    var components = calendar.dateComponents([.year, .month, .day], from: now)
-                    components.hour = timeComponents.hour
-                    components.minute = timeComponents.minute
-                    
-                    if let eventDateToday = calendar.date(from: components), eventDateToday > now {
+                    if date > (now - 3600) {
                         return true
                     }
                 }

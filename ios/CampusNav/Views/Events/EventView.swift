@@ -17,8 +17,10 @@ struct EventView: View {
             settingsManager.primaryColor
                 .ignoresSafeArea()
             VStack {
-                HeaderText(text: "Events")
-                    .environmentObject(settingsManager)
+                HStack {
+                    EventHeader(text: "Events", showFilters: $eventVM.showFilters)
+                        .environmentObject(settingsManager)
+                }
                 EventsList()
                     .environmentObject(buildingVM)
                     .environmentObject(eventVM)
@@ -35,7 +37,7 @@ struct EventView: View {
                     .environmentObject(settingsManager)
             }
             HStack {
-                GenericIcon(animate: $eventVM.animateMyEvents, navStateVar: $navState.events, closedIcon: "bookmark", openIcon: "bookmark.fill", offset: -200, size: 20, onSelect: {
+                GenericIcon(animate: $eventVM.animateMyEvents, closedIcon: "bookmark", openIcon: "bookmark.fill", size: 20, onSelect: {
                     withAnimation(.easeInOut(duration: 0.3)) {
                         eventVM.animateMyEvents.toggle()
                         eventVM.showMyEvents.toggle()
@@ -43,9 +45,11 @@ struct EventView: View {
                         eventVM.showCreateEvent = false
                     }
                 })
+                .offset(x: !navState.events ? -200 : 0)
+                .animation(.easeInOut(duration: 0.3), value: navState.events)
                 .environmentObject(settingsManager)
                 Spacer()
-                GenericIcon(animate: $eventVM.animateEvent, navStateVar: $navState.events, closedIcon: "plus", openIcon: "plus", offset: 200, size: 20, onSelect: {
+                GenericIcon(animate: $eventVM.animateEvent, closedIcon: "plus", openIcon: "plus", size: 20, onSelect: {
                     withAnimation(.none) {
                         eventVM.animateEvent.toggle()
                     }
@@ -55,10 +59,18 @@ struct EventView: View {
                         eventVM.showMyEvents = false
                     }
                 })
+                .offset(x: !navState.events ? 200 : 0)
+                .animation(.easeInOut(duration: 0.3), value: navState.events)
                 .environmentObject(settingsManager)
-                    
+                
             }
             .frame(maxHeight: .infinity, alignment: .top)
+        }
+        .sheet(isPresented: $eventVM.showFilters) {
+            FilterView()
+                .environmentObject(eventVM)
+                .environmentObject(settingsManager)
+                .presentationDetents([.fraction(0.4)])
         }
         .sheet(isPresented: $eventVM.showCreateEvent) {
             CreateEventView()
@@ -66,18 +78,27 @@ struct EventView: View {
                 .environmentObject(buildingVM)
                 .environmentObject(settingsManager)
         }
+        .onChange(of: eventVM.selectedFilters) {
+            eventVM.loadFilteredEvents()
+        }
     }
 }
 
-struct HeaderText: View {
+struct EventHeader: View {
     @EnvironmentObject var settingsManager: SettingsManager
     var text: String
+    @Binding var showFilters: Bool
     var body: some View {
         VStack(alignment: .leading) {
-            Text(text)
-                .font(.system(size: 30))
-                .foregroundStyle(settingsManager.textColor)
-                .fontWeight(.bold)
+            HStack {
+                Text(text)
+                    .font(.system(size: 30))
+                    .foregroundStyle(settingsManager.textColor)
+                    .fontWeight(.bold)
+                Spacer()
+                FilterButton(showFilters: $showFilters)
+                    .environmentObject(settingsManager)
+            }
             Divider()
                 .overlay(settingsManager.textColor)
         }
@@ -85,9 +106,3 @@ struct HeaderText: View {
         .padding(.top, 75)
     }
 }
-
-//#Preview {
-//    CreateEventView(collegePrimary: .burntOrange, collegeSecondary: .offWhite)
-//        .environmentObject(EventViewModel())
-//        .environmentObject(NavigationUIState())
-//}

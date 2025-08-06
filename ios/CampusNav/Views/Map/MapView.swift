@@ -87,19 +87,32 @@ struct MapBoxMapView: View {
                 if !navigationVM.currentCoordinates.isEmpty {
                     MapViewAnnotation(coordinate: navigationVM.currentCoordinates.last!) {
                         // Image that controls the bobbing icon at the destination
-                        Image("dest-pin")
-                            .offset(y: bobbingOffset)
-                            .animation(
-                                .easeInOut(duration: 0.8)
-                                .repeatForever(autoreverses: true),
-                                value: bobbingOffset
-                            )
-                            .onAppear {
-                                bobbingOffset = -10
-                            }
-                            .onDisappear {
-                                bobbingOffset = 0
-                            }
+                        ZStack {
+                            Image("LocationPin.fill")
+                                .renderingMode(.template)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 65, height: 65)
+                                .foregroundStyle(settingsManager.textColor)
+                            Image("LocationPin.fill")
+                                .renderingMode(.template)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 50, height: 50)
+                                .foregroundStyle(settingsManager.accentColor)
+                        }
+                        .offset(y: bobbingOffset - 20)
+                        .animation(
+                            .easeInOut(duration: 0.8)
+                            .repeatForever(autoreverses: true),
+                            value: bobbingOffset
+                        )
+                        .onAppear {
+                            bobbingOffset = -10
+                        }
+                        .onDisappear {
+                            bobbingOffset = 0
+                        }
                     }
                     .priority(1)
                 }
@@ -293,6 +306,11 @@ struct MapBoxMapView: View {
                     withAnimation(.easeOut(duration: 0.3)) {
                         navigationVM.directions = navigationVM.getDirections(destAbbr: navigationVM.currentNodes.last?.abbr ?? "")
                     }
+                }
+            }
+            .onChange(of: navState.centerLocation) {
+                withViewportAnimation(.default(maxDuration: 1)) {
+                    viewport = Viewport.camera(center: navigationVM.currentLocation, zoom: 16)
                 }
             }
             .onChange(of: navigationVM.currentLocation) {

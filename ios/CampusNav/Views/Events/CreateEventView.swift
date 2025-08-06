@@ -22,7 +22,7 @@ struct CreateEventView: View {
     @State var eventSearchText: String = ""
     @State var date: Date = Date()
     @State var time: Date = Date()
-    @State var duration: Date = Calendar.current.date(from: DateComponents(hour: 0, minute: 0)) ?? Date()
+    @State var duration: TimeInterval = 0.0
     
     // Focus vars
     @FocusState var clubFocus: Bool
@@ -72,9 +72,10 @@ struct CreateEventView: View {
                                 Text("Duration")
                                     .font(.system(size: 18))
                                     .foregroundStyle(settingsManager.textColor.opacity(0.6))
-                                DurationSelector(time: $duration)
+                                DurationSelector(duration: $duration)
+                                    .padding(.horizontal, 0)
+                                    .environmentObject(settingsManager)
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .offset(x: -35)
                             }
                         }
                         .padding()
@@ -115,7 +116,7 @@ struct CreateEventView: View {
                         }
                     }
                 }
-                SaveEventButton(building: selectedBuilding, description: description, clubName: clubName, eventName: eventName, isRepeating: isRepeating, days: $date, time: $time, tags: selectedTags)
+                SaveEventButton(building: selectedBuilding, description: description, clubName: clubName, eventName: eventName, duration: duration, isRepeating: isRepeating, days: $date, time: $time, tags: selectedTags)
                     .environmentObject(eventVM)
                     .environmentObject(firebaseManager)
                     .environmentObject(settingsManager)
@@ -147,6 +148,7 @@ struct SaveEventButton: View {
     let description: String?
     let clubName: String?
     let eventName: String?
+    let duration: TimeInterval
     let isRepeating: Bool
     @Binding var days: Date
     @Binding var time: Date
@@ -162,7 +164,8 @@ struct SaveEventButton: View {
             } else if eventName == "" {
                 showEventError = true
             } else {
-                firebaseManager.publishEvent(abbr: building?.abbr ?? "", locationDescription: description, clubName: clubName, eventName: eventName, eventTimes: combinedDateTimeFormatted(day: days, time: time), isRepeating: isRepeating, tags: tagStrings, settingsManager: settingsManager)
+                let (strings, dates) = combinedDateTimeFormatted(day: days, time: time)
+                firebaseManager.publishEvent(abbr: building?.abbr ?? "", locationDescription: description, clubName: clubName, eventName: eventName, eventTimesStrings: strings, eventDates: dates, duration: duration, isRepeating: isRepeating, tags: tagStrings, settingsManager: settingsManager)
                 Task {
                     await eventVM.loadCurrentEvents(firebaseManager: firebaseManager, buildingVM: buildingVM)
                 }

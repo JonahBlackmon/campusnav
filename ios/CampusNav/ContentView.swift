@@ -67,18 +67,6 @@ struct ContentView: View {
         }
     }
     
-//    private var addEvent: some View {
-//        VStack {
-//            Button {
-//                firebaseManager.publishEvent(abbr: "KIN", locationDescription: "", clubName: "", eventName: "", eventTimes: [Date.now], isRepeating: false, settingsManager: settingsManager)
-//            } label: {
-//                Text("Add Event")
-//            }
-//            myEvents
-//        }
-//        .background(Color.white)
-//    }
-    
     private var cardView: some View {
         ZStack {
             settingsManager.primaryColor.edgesIgnoringSafeArea(.all)
@@ -143,7 +131,8 @@ struct ContentView: View {
                 .environmentObject(firebaseManager)
                 .environmentObject(settingsManager)
         case "Settings":
-            SettingsView2()
+            SettingsView()
+                .environmentObject(navigationVM)
                 .environmentObject(settingsManager)
         default:
             MapView()

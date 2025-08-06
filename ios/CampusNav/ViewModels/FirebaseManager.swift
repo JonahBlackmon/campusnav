@@ -13,13 +13,15 @@ class FirebaseManager: ObservableObject {
     
     // Save published events to users UserDefaults and use that for storing what user made what
     func publishEvent(abbr: String, locationDescription: String?, clubName: String?,
-                      eventName: String?, eventTimes: [String], isRepeating: Bool, tags: [String], settingsManager: SettingsManager) {
+                      eventName: String?, eventTimesStrings: [String], eventDates: [Date], duration: TimeInterval, isRepeating: Bool, tags: [String], settingsManager: SettingsManager) {
         let event = Event(
             abbr: abbr,
             location_description: locationDescription,
             club_name: clubName,
             event_name: eventName,
-            event_times: eventTimes,
+            event_times_strings: eventTimesStrings,
+            event_dates: eventDates,
+            duration: duration,
             isRepeating: isRepeating,
             tags: tags
         )
