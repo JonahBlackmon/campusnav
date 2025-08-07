@@ -60,7 +60,7 @@ struct InformationView: View {
             .padding(.bottom)
             .environmentObject(settingsManager)
             InformationButton(text: "Terms & Conditions", icon: "book") {
-                if let url = URL(string: "https://github.com/JonahBlackmon/campusnav") {
+                if let url = URL(string: "https://jonahblackmon.github.io/campusnav/terms-and-conditions.html") {
                     openURL(url)
                 }
             }

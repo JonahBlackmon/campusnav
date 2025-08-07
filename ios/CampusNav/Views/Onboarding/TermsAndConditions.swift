@@ -48,7 +48,7 @@ struct TermsAndConditions: View {
             .padding(.horizontal)
             .offset(y: -5)
             Button {
-                if let url = URL(string: "https://github.com/JonahBlackmon/campusnav") {
+                if let url = URL(string: "https://jonahblackmon.github.io/campusnav/terms-and-conditions.html") {
                     openURL(url)
                 }
             } label: {
