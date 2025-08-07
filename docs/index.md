@@ -15,3 +15,4 @@ GitHub Issues: [Submit here](https://github.com/JonahBlackmon/CampusNav/issues)
   
 ## Legal
 Please review our [Terms and Conditions](terms-and-conditions.md).
+Please review our [Privacy Policy](privacy-policy.md).
