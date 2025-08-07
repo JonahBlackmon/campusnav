@@ -6,6 +6,7 @@
 //
 import SwiftUI
 
+// Only triggers when proximity is close to destination
 struct ArrivalScreen: View {
     @State private var isVisible: Bool = false
     @EnvironmentObject var navState: NavigationUIState

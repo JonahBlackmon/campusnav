@@ -10,6 +10,12 @@ import MapboxMaps
 @_spi(Experimental) import MapboxMaps
 import Turf
 
+/*
+    Map View in charge of displaying map and allowing functionality with Swift backend
+    Currently using MapBox, but can be changed to other mappings such as Apple Maps if needed
+    Chose MapBox for the customizability, and 3D building rendering, and web/cross platform support
+ */
+
 struct MapView: View {
     @EnvironmentObject var navState: NavigationUIState
     @EnvironmentObject var buildingVM: BuildingViewModel
@@ -27,6 +33,8 @@ struct MapView: View {
     }
 }
 
+// Abbreviations that don't have buildings attached to them,
+// Stops the MapBox view from bugging out after the return false fail safe further down
 var specialAbbrs: [String] = [
     "STD",
     "NEZ",
@@ -54,20 +62,25 @@ enum GeoJSONLayer : String {
 }
 
 struct MapBoxMapView: View {
-    @State private var invertedSourceData: GeoJSONSourceData? = nil
-    @State private var blockSourceData: GeoJSONSourceData? = nil
-    @State private var buildingSourceData: GeoJSONSourceData? = nil
-    @State private var viewport = Viewport.camera(center: CLLocationCoordinate2D(latitude: 30.2850, longitude: -97.7335), zoom: 13.9, bearing: 0, pitch: 0)
-    @State private var zoomAboveThreshold = false
-    @State var selectedFeature: FeaturesetFeature?
-    @State var currentZoom: Double = 13.9
-    @State private var bobbingOffset: CGFloat = 0
-    @State private var animatedUserCoordinate: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: 30.287265, longitude: -97.737051)
     @EnvironmentObject var navState: NavigationUIState
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var buildingVM: BuildingViewModel
     @EnvironmentObject var eventVM: EventViewModel
     @EnvironmentObject var settingsManager: SettingsManager
+    
+    @State private var invertedSourceData: GeoJSONSourceData? = nil
+    @State private var blockSourceData: GeoJSONSourceData? = nil
+    @State private var buildingSourceData: GeoJSONSourceData? = nil
+    @State private var viewport = Viewport.camera(center:
+                                                    CLLocationCoordinate2D(latitude: 30.2850, longitude: -97.7335),
+                                                    zoom: 13.9, bearing: 0, pitch: 0)
+    @State private var zoomAboveThreshold = false
+    @State var selectedFeature: FeaturesetFeature?
+    @State var currentZoom: Double = 13.9
+    @State private var bobbingOffset: CGFloat = 0
+    @State private var animatedUserCoordinate: CLLocationCoordinate2D =
+                        CLLocationCoordinate2D(latitude: 30.287265, longitude: -97.737051)
+    
     var body: some View {
         MapReader { proxy in
             Map(viewport: $viewport) {
@@ -300,6 +313,9 @@ struct MapBoxMapView: View {
             }
             .onChange(of: navState.isNavigating) {
                 if navState.isNavigating {
+                    if navigationVM.currentLocation?.longitude != nil && navigationVM.currentLocation?.latitude != nil {
+                        (navigationVM.currentCoordinates, navigationVM.currentNodes, navigationVM.distance) = find_route(lat: navigationVM.currentLocation!.latitude, lng: navigationVM.currentLocation!.longitude, dest_abbr: buildingVM.abbr())
+                    }
                     withViewportAnimation(.default(maxDuration: 1)) {
                         viewport = Viewport.camera(center: centerOfRoute(bounds: routeBounds()), zoom: 14.75)
                     }
@@ -337,6 +353,12 @@ struct MapBoxMapView: View {
     }
     
     func routeBounds() -> CoordinateBounds {
+        guard navigationVM.currentCoordinates.first != nil else {
+            return CoordinateBounds(
+                southwest: CLLocationCoordinate2D(latitude: 30.2850, longitude: -97.7335),
+                northeast: CLLocationCoordinate2D(latitude: 30.2850, longitude: -97.7335)
+            )
+        }
         var minLat = navigationVM.currentCoordinates[0].latitude
         var minLng = navigationVM.currentCoordinates[0].longitude
         var maxLat = navigationVM.currentCoordinates[0].latitude

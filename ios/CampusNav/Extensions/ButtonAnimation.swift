@@ -6,6 +6,7 @@
 //
 import SwiftUI
 
+// Unused in apps curren state
 struct HorizontalGrow: ViewModifier {
     let isActive: Bool
 

@@ -8,6 +8,7 @@
 import Foundation
 import MapKit
 
+// Main graph struct responsible for containing data to navigate with
 struct Graph {
     var nodes: [Node]
     var pathways: [Pathway]

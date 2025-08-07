@@ -6,6 +6,11 @@
 //
 import SwiftUI
 
+/*
+    Filter and tag are used interchangebly, filters are used in the filter view,
+    tags are used during event creation
+ */
+
 struct AddTags: View {
     @EnvironmentObject var settingsManager: SettingsManager
     @Binding var selectedTags: Set<EventTag>

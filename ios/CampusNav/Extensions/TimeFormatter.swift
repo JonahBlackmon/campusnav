@@ -5,6 +5,7 @@
 //  Created by Jonah Blackmon on 7/18/25.
 //
 
+// Finds the average time it'd take to walk x meters at a standard rate of 1.3 m/s
 func meters_to_time(meters: Double) -> String {
     let seconds = Int(meters / 1.3)
     switch seconds {

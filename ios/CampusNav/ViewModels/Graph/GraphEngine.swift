@@ -10,6 +10,7 @@ import SwiftUI
 
 var distance: Double = -1.0
 
+// Finds the closest goal to your current position
 func find_closest_goal(graph: Graph, abbr: String?, pos: Coordinate) -> Int {
     var closest_node = -1
     var shortestDistance = Double.infinity
@@ -25,6 +26,7 @@ func find_closest_goal(graph: Graph, abbr: String?, pos: Coordinate) -> Int {
     return closest_node
 }
 
+// Finds the closest coordinate to where you currently are, splitting a path if necessary
 func find_closest_coordinate(pos: Coordinate, graph: inout Graph) -> Node {
     var closest = graph.nodes[0].point
     var distance = pos.distance(to: closest)
@@ -89,6 +91,7 @@ func find_closest_coordinate(pos: Coordinate, graph: inout Graph) -> Node {
     return current_pos
 }
 
+// Splits a path at the point closest to the caller
 func split_path(path_index: Int, new_node: Node, graph: inout Graph) {
     var oldPath = graph.pathways[path_index]
     var newPath = Pathway(
@@ -104,6 +107,7 @@ func split_path(path_index: Int, new_node: Node, graph: inout Graph) {
     graph.pathways.append(newPath)
 }
 
+// Finds the distance to the closest point on a path
 func distance_to_path(pos: Coordinate, start: Coordinate, end: Coordinate) -> Double {
     let posX = pos.longitude
     let posY = pos.latitude
@@ -136,6 +140,7 @@ func distance_to_path(pos: Coordinate, start: Coordinate, end: Coordinate) -> Do
     return pos.distance(to: closest)
 }
 
+// Finds the closest point on a path
 func find_closest_point_on_path(pos: Coordinate, path: Pathway, graph: Graph, new_point: inout Bool, node_id: inout Int) -> Coordinate {
     let posX = pos.longitude
     let posY = pos.latitude
@@ -177,10 +182,12 @@ func find_closest_point_on_path(pos: Coordinate, path: Pathway, graph: Graph, ne
     return closest
 }
 
+// Evaluates if 2 coordinates are within 5 meters of each other
 private func coordinatesEqual(a: Coordinate, b: Coordinate) -> Bool {
     return a.distance(to: b) < 5
 }
 
+// Runs the a* routing algorithm to find the shortest route between a start point and a goal point
 func a_star(graph: inout Graph, start: Int, goal: Int, out_path_len: inout Int) -> [Int] {
     let n = graph.num_nodes
     var g_score: [Double] = Array(repeating: Double.infinity, count: n)
@@ -241,6 +248,7 @@ func a_star(graph: inout Graph, start: Int, goal: Int, out_path_len: inout Int) 
     return node_path
 }
 
+// Gets all neighbors of a point used in a* algorithm
 func get_neighbors(graph: inout Graph, node_index: Int, out_count: inout Int) -> [Int] {
     var neighbors: [Int] = []
     for i in 0..<graph.num_paths {
@@ -254,6 +262,7 @@ func get_neighbors(graph: inout Graph, node_index: Int, out_count: inout Int) ->
     return neighbors
 }
 
+// Main caller function outside of the graph engine to find the coordinates, nodes, and distance that make up the route to a goal
 func find_route(lat: Double, lng: Double, dest_abbr: String) -> ([CLLocationCoordinate2D], [Node], Double) {
     var tempNodes = nodes
     var tempPaths = pathways
@@ -281,7 +290,8 @@ func find_route(lat: Double, lng: Double, dest_abbr: String) -> ([CLLocationCoor
     return (node_path.map { graph.nodes[$0].point.clLocationCoordinate }, node_path.map { graph.nodes[$0] }, distance)
 }
 
-
+// List of all nodes on UT Austin Campus
+// Planning to move to json when more campus' are added
 let nodes: [Node] = [
     Node(id: 0, abbr: "KIN", point: Coordinate(latitude: 30.2903876632107, longitude: -97.7399904834272)),
     Node(id: 1, abbr: nil, point: Coordinate(latitude: 30.2903945389373, longitude: -97.7401692798991)),
@@ -699,7 +709,8 @@ let nodes: [Node] = [
     Node(id: 413, abbr: "PHR", point: Coordinate(latitude: 30.288317, longitude: -97.738337))
 ]
 
-
+// All pathways with distance on UT Austin campus
+// Planning to move to json when more campus' are added
 let pathways: [Pathway] = [
     Pathway(from: 0, to: 1, distance: 17.184114),
     Pathway(from: 1, to: 2, distance: 65.687508),

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// Class in charge of holding all other VM's as well as functions that need to use multiple VMs
 class NavigationCoordinator: ObservableObject {
     
     @Published var navigationVM: NavigationViewModel

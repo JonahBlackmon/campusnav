@@ -9,6 +9,7 @@ import SwiftUI
 import MapboxMaps
 import Turf
 
+// Building VM in charge of the currently selected building, and which buildings get displayed in search features
 class BuildingViewModel: ObservableObject {
     
     @Published var buildingList: [Building] = []
@@ -31,6 +32,7 @@ class BuildingViewModel: ObservableObject {
         return selectedBuilding?.photoURL ?? ""
     }
     
+    // Loads buildings
     func loadBuildings(pathName: String) {
         guard let url = Bundle.main.url(forResource: pathName, withExtension: "geojson") else {
             return
@@ -73,6 +75,7 @@ class BuildingViewModel: ObservableObject {
         
     }
     
+    // Returns all buildings whose name or abbr matches some part of the matching search
     func searchBuilding(matching search: String) -> [Building] {
         guard !search.isEmpty else {
             return []

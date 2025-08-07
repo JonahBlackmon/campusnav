@@ -6,8 +6,7 @@
 //
 import SwiftUI
 
-import SwiftUI
-
+// Current EventTags, can be expanded or changed as needed
 enum EventTag: String, CaseIterable, Identifiable, Codable, Equatable {
     case social = "Social"
     case study = "Study"

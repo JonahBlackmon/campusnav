@@ -6,6 +6,7 @@
 //
 import SwiftUI
 
+// Used in event creator. Formats date to day of week & time
 func combinedDatesFormatted(days: Set<DateComponents>, time: Date) -> [String] {
     var calendar = Calendar.current
     calendar.timeZone = TimeZone.current
@@ -30,6 +31,7 @@ func combinedDatesFormatted(days: Set<DateComponents>, time: Date) -> [String] {
     return Array(Set(formattedDates)).sorted()
 }
 
+// Combines the date and the time it takes place on
 func combinedDateTimeFormatted(day: Date, time: Date) -> ([String], [Date]) {
     var calendar = Calendar.current
     calendar.timeZone = TimeZone.current

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// View model in charge of data related to events and event creation
 class EventViewModel: ObservableObject {
     @Published var allEvents: [Event] = []
     @Published var showCreateEvent: Bool = false

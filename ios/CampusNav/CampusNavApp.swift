@@ -24,36 +24,41 @@ struct CampusNavApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject var navCoord: NavigationCoordinator = NavigationCoordinator()
     @StateObject var settingsManager: SettingsManager = SettingsManager()
+    @AppStorage("isOnboarded") var isOnboarded: Bool = false
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .preferredColorScheme(settingsManager.darkMode ? .dark : .light)
-                .environmentObject(settingsManager)
-                .environmentObject(navCoord.buildingVM)
-                .environmentObject(navCoord.headerVM)
-                .environmentObject(navCoord.navState)
-                .environmentObject(navCoord.navigationVM)
-                .environmentObject(navCoord.firebaseManager)
-                .environmentObject(navCoord.eventVM)
-                .environmentObject(navCoord)
-                .onAppear {
-                    navCoord.buildingVM.loadBuildings(pathName: "buildings_simple")
-                    Task {
-                        await navCoord.eventVM.loadCurrentEvents(firebaseManager: navCoord.firebaseManager, buildingVM: navCoord.buildingVM)
+            if isOnboarded {
+                ContentView()
+                    .preferredColorScheme(settingsManager.darkMode ? .dark : .light)
+                    .environmentObject(settingsManager)
+                    .environmentObject(navCoord.buildingVM)
+                    .environmentObject(navCoord.headerVM)
+                    .environmentObject(navCoord.navState)
+                    .environmentObject(navCoord.navigationVM)
+                    .environmentObject(navCoord.firebaseManager)
+                    .environmentObject(navCoord.eventVM)
+                    .environmentObject(navCoord)
+                    .onAppear {
+                        navCoord.buildingVM.loadBuildings(pathName: "buildings_simple")
+                        Task {
+                            await navCoord.eventVM.loadCurrentEvents(firebaseManager: navCoord.firebaseManager, buildingVM: navCoord.buildingVM)
+                        }
                     }
-                }
+                    .onChange(of: isOnboarded) {
+                        settingsManager.initializeAfterOnboarding()
+                    }
+                    .onAppear {
+                        if isOnboarded {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                settingsManager.initializeAfterOnboarding()
+                            }
+                        }
+                    }
+            } else {
+                OnboardingView(isOnboarded: $isOnboarded)
+                    .environmentObject(settingsManager)
+            }
         }
     }
-}
-
-#Preview {
-    ContentView()
-        .environmentObject(BuildingViewModel())
-        .environmentObject(HeaderViewModel())
-        .environmentObject(NavigationUIState())
-        .environmentObject(NavigationViewModel(currentCoordinates: [], currentNodes: []))
-        .environmentObject(SettingsManager())
-        .environmentObject(FirebaseManager())
-        .environmentObject(EventViewModel())
-        .environmentObject(NavigationCoordinator())
 }

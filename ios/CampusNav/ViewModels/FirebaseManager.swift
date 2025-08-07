@@ -6,6 +6,7 @@
 //
 import FirebaseFirestore
 
+// Manager in charge of accessing firebase db
 class FirebaseManager: ObservableObject {
     
     private let db = Firestore.firestore()
@@ -37,11 +38,13 @@ class FirebaseManager: ObservableObject {
         }
     }
     
+    // Deletes an event based on document ref
     func deleteEvent(ref: String, settingsManager: SettingsManager) {
         eventCollection.document(ref).delete()
         settingsManager.removeEvent(ref: ref)
     }
     
+    // Gets all events
     func getEvents() async -> [Event] {
         var events: [Event] = []
         do {

@@ -6,6 +6,11 @@
 //
 import SwiftUI
 
+/*
+    Custom sheet view designed to allow for gesture dragging,
+    custom heights, and expanded functionality
+ */
+
 let collapsedHeight: CGFloat = 165
 let expandedHeight: CGFloat = UIScreen.main.bounds.height * 0.90
 

@@ -6,6 +6,7 @@
 //
 import SwiftUI
 
+// UI State vars to keep track of
 class NavigationUIState: ObservableObject {
     @Published var currentView: String = "Map"
     @Published var showNavigationCard = false

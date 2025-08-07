@@ -6,6 +6,7 @@
 //
 import SwiftUI
 
+// View model in charge of data related to header
 class HeaderViewModel: ObservableObject {
     @Published var animateFavorites: Bool = false
     @Published var animateLocation: Bool = false

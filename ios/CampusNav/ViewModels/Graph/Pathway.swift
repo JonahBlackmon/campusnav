@@ -7,6 +7,7 @@
 
 import Foundation
 
+// Pathways connecting nodes on the graph
 struct Pathway {
     var from: Int
     var to: Int

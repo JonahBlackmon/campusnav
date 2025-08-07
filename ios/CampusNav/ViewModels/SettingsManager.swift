@@ -25,7 +25,7 @@ func colorFromString(colorString: String) -> Color {
 }
 
 
-
+// Manager in charge of data related to UserDefaults, establishes College Config as well
 class SettingsManager: ObservableObject {
     let defaults = UserDefaults.standard
     
@@ -40,27 +40,57 @@ class SettingsManager: ObservableObject {
     
     @Published var events: [String : LocalEvent] = [:]
     
+    @Published var config: CollegeConfig?
+    
+    
     init() {
-        do {
-            if let favoritesData = self.defaults.object(forKey: Keys.Favorites) as? Data {
-                do {
-                    favorites = try JSONDecoder().decode([String : Building].self, from: favoritesData)
-                } catch {
-                    print("Error loading favorites: \(error)")
-                }
+        self.darkMode = defaults.object(forKey: Keys.DarkMode) != nil
+            ? defaults.bool(forKey: Keys.DarkMode)
+            : false
+
+        if let favoritesData = self.defaults.object(forKey: Keys.Favorites) as? Data {
+            do {
+                favorites = try JSONDecoder().decode([String : Building].self, from: favoritesData)
+            } catch {
+                print("Error loading favorites: \(error)")
             }
-            if let eventsData = self.defaults.object(forKey: Keys.Events) as? Data {
-                do {
-                    events = try JSONDecoder().decode([String : LocalEvent].self, from: eventsData)
-                } catch {
-                    print("Error loading events: \(error)")
-                }
-            }
-            self.darkMode = defaults.object(forKey: Keys.DarkMode) != nil
-                ? defaults.bool(forKey: Keys.DarkMode)
-                : false
-            setThemeColors()
         }
+
+        if let eventsData = self.defaults.object(forKey: Keys.Events) as? Data {
+            do {
+                events = try JSONDecoder().decode([String : LocalEvent].self, from: eventsData)
+            } catch {
+                print("Error loading events: \(error)")
+            }
+        }
+    }
+    
+    // College specific data to be loaded once a user selects a college
+    func initializeAfterOnboarding() {
+        loadCurrentCollegeConfig()
+        applyCollegeThemeColors()
+        setThemeColors()
+    }
+    
+    private func loadCurrentCollegeConfig() {
+        let collegeID = UserDefaults.standard.string(forKey: "collegeID")
+        print("Attempting to load config for collegeID: \(collegeID ?? "nil")")
+        guard let collegeID = UserDefaults.standard.string(forKey: "collegeID"),
+              let url = Bundle.main.url(forResource: "\(collegeID)Config", withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let config = try? JSONDecoder().decode(CollegeConfig.self, from: data) else {
+            print("Failed to load college config")
+            return
+        }
+
+        self.config = config
+    }
+    
+    func applyCollegeThemeColors() {
+        guard let config = config else { return }
+
+        accentColorString = "burntOrange"// config.accentColorString
+        lighterAccentString = "lightOrange"// config.lighterAccentColorString
     }
     
     func setThemeColors() {
@@ -91,16 +121,19 @@ class SettingsManager: ObservableObject {
         setThemeColors()
     }
     
+    // Updates user theme colors i.e. dark mode vs light mode
     func updateThemeColors(primaryColor: String, textColor: String) {
         defaults.set(primaryColor, forKey: Keys.PrimaryColor)
         defaults.set(textColor, forKey: Keys.TextColor)
     }
     
+    // Changes User college colors
     func updateCollegeColors(accentColor: String, lighterAccentColor: String) {
         defaults.set(lighterAccentColor, forKey: Keys.PrimaryColor)
         defaults.set(accentColor, forKey: Keys.AccentColor)
     }
     
+    // Adds event from UserDefaults
     func writeEvent(_ event: LocalEvent, ref: String) {
         events[ref] = event
         do {
@@ -110,6 +143,7 @@ class SettingsManager: ObservableObject {
         }
     }
     
+    // Removes event from UserDefaults
     func removeEvent(ref: String) {
         if events.removeValue(forKey: ref) != nil {
             do {
@@ -121,6 +155,7 @@ class SettingsManager: ObservableObject {
         }
     }
     
+    // Adds or removes a favorited building from UserDefaults depending on if it already exists
     func writeFavorites(_ favorite: Building, abbr: String) {
         if favorites[abbr] != nil {
             favorites.removeValue(forKey: abbr)

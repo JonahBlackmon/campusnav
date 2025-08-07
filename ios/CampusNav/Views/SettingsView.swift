@@ -57,6 +57,13 @@ struct InformationView: View {
                     openURL(url)
                 }
             }
+            .padding(.bottom)
+            .environmentObject(settingsManager)
+            InformationButton(text: "Terms & Conditions", icon: "book") {
+                if let url = URL(string: "https://github.com/JonahBlackmon/campusnav") {
+                    openURL(url)
+                }
+            }
             .environmentObject(settingsManager)
         }
         .padding()

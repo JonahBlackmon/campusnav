@@ -7,6 +7,11 @@
 import SwiftUI
 import SDWebImageSwiftUI
 
+/*
+    Custom Tab Bar allowing for seamless transition between various views
+    Manages by the NavigationUIState primarily
+ */
+
 struct CustomTabBar: View {
     
     // [(Tab Name, System Icon)]
