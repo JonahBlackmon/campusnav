@@ -9,6 +9,10 @@ import SwiftUI
 import MapKit
 import CoreLocation
 
+/*
+    Main Content View serving as the central hub for connected views
+ */
+
 struct ContentView: View {
     @EnvironmentObject var buildingVM: BuildingViewModel
     @EnvironmentObject var settingsManager: SettingsManager
@@ -40,7 +44,6 @@ struct ContentView: View {
         }
         .onChange(of: navState.isNavigating) {
             if navState.isNavigating {
-                navCoord.navigationLogic()
                 navigationVM.proximityTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { timer in
                     navCoord.proximityCheck()
                 }

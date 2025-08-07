@@ -36,7 +36,7 @@ extension Event {
     }
 }
 
-
+// Local events used for in app access
 struct LocalEvent: Identifiable, Codable {
     var id: String?
     var abbr: String

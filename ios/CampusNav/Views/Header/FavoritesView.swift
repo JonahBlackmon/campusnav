@@ -24,18 +24,30 @@ struct FavoritesView: View {
                 }
             ZStack {
                 settingsManager.primaryColor
-                if !settingsManager.favorites.isEmpty {
-                    ScrollView {
-                        ForEach(Array(settingsManager.favorites.keys.enumerated()), id: \.element) { index, key in
-                            FavoritesItem(key: key, index: index)
-                                .environmentObject(settingsManager)
-                                .environmentObject(buildingVM)
-                                .environmentObject(navState)
-                                .environmentObject(headerVM)
+                VStack {
+                    HeaderText(text: "Favorites")
+                    if !settingsManager.favorites.isEmpty {
+                        ScrollView {
+                            ForEach(Array(settingsManager.favorites.keys.enumerated()), id: \.element) { index, key in
+                                FavoritesItem(key: key, index: index)
+                                    .environmentObject(settingsManager)
+                                    .environmentObject(buildingVM)
+                                    .environmentObject(navState)
+                                    .environmentObject(headerVM)
+                            }
                         }
+                    } else {
+                        Text("No Favorites Yet!")
+                            .font(.system(size: 17))
+                            .foregroundStyle(settingsManager.accentColor)
+                            .fontWeight(.bold)
+                            .padding(5)
+                        Text("Favorited locations will appear here.")
+                            .font(.system(size: 15))
+                            .foregroundStyle(settingsManager.textColor.opacity(0.8))
+                            .multilineTextAlignment(.center)
                     }
-                } else {
-                    Text("Try favoriting some locations!")
+                    Spacer()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

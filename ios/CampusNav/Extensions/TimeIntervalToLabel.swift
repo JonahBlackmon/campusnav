@@ -6,6 +6,7 @@
 //
 import SwiftUI
 
+// Converts time interval to readable labels
 func timeIntervalToLabel(_ interval: TimeInterval) -> String {
     let totalMinutes = Int(interval) / 60
     let h = totalMinutes / 60

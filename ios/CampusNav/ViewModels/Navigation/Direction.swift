@@ -6,6 +6,7 @@
 //
 import Foundation
 
+// Used for display purposes to correlate distance with images
 enum WalkingDirection: Equatable {
     case forward, backward, left, right
     var description: String {

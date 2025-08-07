@@ -6,6 +6,7 @@
 //
 import SwiftUI
 
+// Trapezoid used as the directional cone
 struct Trapezoid: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()

@@ -8,6 +8,7 @@
 import Foundation
 import MapKit
 
+// Nodes that make up the graph
 struct Node {
     var id: Int
     var abbr: String?

@@ -145,6 +145,7 @@ struct EventItem: View {
         }
     }
     
+    // Opens navigation card from events
     private var GoHereButton: some View {
         Button {
             withAnimation(.easeInOut(duration: 0.3)) {

@@ -9,6 +9,7 @@ import SwiftUI
 import MapKit
 import CoreLocation
 
+// View model in charge of navigation related data
 class NavigationViewModel: NSObject, ObservableObject {
     
     @Published var locationManager: CLLocationManager?
@@ -167,7 +168,7 @@ class NavigationViewModel: NSObject, ObservableObject {
     
 }
 
-
+// Location access
 extension NavigationViewModel: CLLocationManagerDelegate {
     
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {

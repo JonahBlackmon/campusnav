@@ -6,6 +6,7 @@
 //
 import SwiftUI
 
+// Calculates the haversine distance between 2 coordinates
 func haversine(a: Coordinate, b: Coordinate) -> Double {
     let radius = 6371.0088
     let dLat = deg2rad(degree: b.latitude - a.latitude)

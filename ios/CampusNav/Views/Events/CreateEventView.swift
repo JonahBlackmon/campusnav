@@ -144,6 +144,7 @@ struct SaveEventButton: View {
     @EnvironmentObject var eventVM: EventViewModel
     @EnvironmentObject var firebaseManager: FirebaseManager
     @EnvironmentObject var buildingVM: BuildingViewModel
+    
     let building: Building?
     let description: String?
     let clubName: String?
@@ -154,6 +155,7 @@ struct SaveEventButton: View {
     @Binding var time: Date
     let tags: Set<EventTag>
     var tagStrings: [String] { tags.map { $0.rawValue } }
+    
     @State var showEventError: Bool = false
     @State var showDaysError: Bool = false
     @State var showBuildingError: Bool = false
