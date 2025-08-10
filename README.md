@@ -1,4 +1,4 @@
-<img width="75" height="75" alt="CampusNavLogoBG" src="https://github.com/user-attachments/assets/c0105c03-3e83-4a66-ac74-d5e6f1872288" />
+<img width="75" height="75" alt="CampusNavLogoBG" src="https://github.com/user-attachments/assets/d64411ac-b3ad-4c3c-b2f6-3136809e6cb8" />
 
 # CampusNav - College Navigation App
 
