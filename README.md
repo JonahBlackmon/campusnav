@@ -4,6 +4,10 @@
 
 ---
 
+<a href="https://apps.apple.com/app/id6749721607">
+  <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" width="160"/>
+</a>
+
 <div align="left">
   <img width="200" alt="campusnavss4" src="https://github.com/user-attachments/assets/fc63c2a4-b2d6-4a2c-bea2-da896b1fbf99" />
   <img width="200" alt="campusnavss3" src="https://github.com/user-attachments/assets/e71c4169-3e05-45f0-bc9f-33196af21909" />
