@@ -1,3 +1,5 @@
+[CampusNavLogo.pdf](https://github.com/user-attachments/files/21707601/CampusNavLogo.pdf)
+
 # CampusNav - College Navigation App
 
 **CampusNav** is your better way of navigating your college campus. Get step-by-step directions, save frequent locations, and browse local events to have the best experience you can on campus.
